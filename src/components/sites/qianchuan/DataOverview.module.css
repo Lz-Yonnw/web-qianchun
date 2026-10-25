@@ -1,0 +1,273 @@
+.detailToolbar {
+  display: flex;
+  min-height: 62px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.tabs {
+  display: flex;
+  align-self: stretch;
+  align-items: center;
+  gap: 28px;
+}
+
+.tabs button {
+  position: relative;
+  height: 100%;
+  color: #4e5969;
+  font-size: 14px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.tabs button::after {
+  position: absolute;
+  right: 0;
+  bottom: 8px;
+  left: 0;
+  width: 24px;
+  height: 3px;
+  margin: auto;
+  border-radius: 2px;
+  background: transparent;
+  content: "";
+}
+
+.tabs .tabActive {
+  color: #1d2129;
+}
+
+.tabs .tabActive::after {
+  background: #3156ff;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.actions button {
+  display: inline-flex;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border-radius: 4px;
+  padding: 0 16px;
+  font-size: 14px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.primaryAction {
+  background: #3156f5;
+  color: #fff;
+}
+
+.secondaryAction {
+  border: 1px solid transparent;
+  background: #f7f8fa;
+  color: #323335;
+}
+
+.secondaryAction:hover {
+  border-color: #d8dce5;
+  background: #fff;
+}
+
+.secondaryAction svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.2;
+}
+
+.secondaryAction svg circle {
+  fill: #fff;
+}
+
+.secondaryAction > span {
+  margin-left: 8px;
+  color: #a0a5ad;
+}
+
+.detailBody {
+  display: flex;
+  min-height: 352px;
+  gap: 20px;
+}
+
+.indicatorGrid {
+  display: grid;
+  width: 316px;
+  flex: 0 0 316px;
+  align-content: start;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 8px;
+}
+
+.indicatorCard {
+  display: flex;
+  min-width: 0;
+  height: 106px;
+  flex-direction: column;
+  align-items: flex-start;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: #f7f7f9;
+  padding: 17px 14px 12px;
+  text-align: left;
+  transition: border-color .15s, background .15s;
+  cursor: pointer;
+}
+
+.indicatorCard:hover {
+  background: #f2f4f8;
+}
+
+.indicatorCard.leftSelected {
+  border-color: #3156ff;
+  background: #f1f5ff;
+}
+
+.indicatorCard.rightSelected {
+  border-color: #00b8c8;
+  background: #ecfbfc;
+}
+
+.indicatorLabel {
+  max-width: 100%;
+  overflow: hidden;
+  color: #323335;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 18px;
+  text-decoration: underline dashed #969aa0;
+  text-underline-offset: 4px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.indicatorCard strong {
+  margin-top: 7px;
+  color: #323335;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 22px;
+}
+
+.indicatorCard small {
+  margin-top: 5px;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.up { color: #f53f3f; }
+.down { color: #00a63c; }
+.flat { color: #a2a8b2; }
+
+.chartArea {
+  min-width: 0;
+  flex: 1;
+  padding-top: 2px;
+}
+
+.legend {
+  display: flex;
+  height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+}
+
+.legendDropdown {
+  position: relative;
+}
+
+.legendButton {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #4e5969;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.legendButton svg {
+  width: 10px;
+  height: 10px;
+  fill: none;
+  stroke: #86909c;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.legendSwatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.legendBackdrop {
+  position: fixed;
+  z-index: 10;
+  inset: 0;
+}
+
+.legendMenu {
+  position: absolute;
+  z-index: 20;
+  top: 24px;
+  left: 0;
+  width: 170px;
+  overflow: hidden;
+  border: 1px solid #eef0f3;
+  border-radius: 6px;
+  background: #fff;
+  padding: 4px 0;
+  box-shadow: 0 6px 20px #1d21291f;
+}
+
+.legendMenu button {
+  display: block;
+  width: 100%;
+  padding: 7px 12px;
+  color: #4e5969;
+  font-size: 13px;
+  text-align: left;
+}
+
+.legendMenu button:hover,
+.legendMenu .legendActive {
+  background: #f2f6ff;
+  color: #2a55e5;
+}
+
+.legendMenu button:disabled {
+  color: #c9cdd4;
+  cursor: not-allowed;
+}
+
+.dualChart {
+  display: block;
+  width: 100%;
+  height: 286px;
+  overflow: visible;
+}
+
+@media (max-width: 1500px) {
+  .tabs { gap: 20px; }
+  .actions button { padding-inline: 12px; }
+  .indicatorGrid { width: 300px; flex-basis: 300px; }
+}
+
+@media (max-width: 1100px) {
+  .detailToolbar { align-items: flex-start; flex-direction: column; padding-block: 12px; }
+  .tabs { min-height: 38px; }
+  .actions { align-self: flex-end; }
+  .detailBody { min-width: 870px; }
+}

@@ -1,0 +1,149 @@
+"use client";
+
+import { useState, type ReactNode } from "react";
+import { DateRangePicker } from "./DateRangePicker";
+import { refreshCurrentTime, useCurrentTime } from "./currentTime";
+import type { MetricView, PeriodKey } from "./homeData";
+import styles from "./OverviewFrame.module.css";
+
+function formatMoney(value: number) {
+  return new Intl.NumberFormat("zh-CN", { maximumFractionDigits: 2 }).format(value);
+}
+
+function curvePath(points: { x: number; y: number }[]) {
+  if (points.length === 0) return "";
+  if (points.length === 1) return `M${points[0].x} ${points[0].y}`;
+  let value = `M${points[0].x} ${points[0].y}`;
+  for (let index = 0; index < points.length - 1; index += 1) {
+    const p0 = points[Math.max(0, index - 1)];
+    const p1 = points[index];
+    const p2 = points[index + 1];
+    const p3 = points[Math.min(points.length - 1, index + 2)];
+    const cp1 = { x: p1.x + (p2.x - p0.x) / 6, y: p1.y + (p2.y - p0.y) / 6 };
+    const cp2 = { x: p2.x - (p3.x - p1.x) / 6, y: p2.y - (p3.y - p1.y) / 6 };
+    value += ` C${cp1.x} ${cp1.y},${cp2.x} ${cp2.y},${p2.x} ${p2.y}`;
+  }
+  return value;
+}
+
+function ConsumptionChart({ axis, values, startDate }: { axis: string[]; values: number[]; startDate: string }) {
+  const [hovered, setHovered] = useState<number | null>(null);
+  const maxValue = Math.max(...values, 1);
+  const points = values.map((value, index) => ({
+    x: values.length > 1 ? index * 1000 / (values.length - 1) : 0,
+    y: 300 - value / maxValue * 300,
+  }));
+  const line = curvePath(points);
+  const ticks = [1, 0.75, 0.5, 0.25, 0];
+
+  return (
+    <div className={styles.chart} aria-label="账户整体消耗趋势">
+      <span className={styles.unit}>消耗(元)</span>
+      <div className={styles.plot} onMouseLeave={() => setHovered(null)}>
+        {ticks.map((tick, index) => (
+          <div key={tick} className={styles.gridline} style={{ top: `${index * 25}%` }}>
+            <span>{formatMoney(maxValue * tick)}</span>
+          </div>
+        ))}
+        {points.length > 0 && (
+          <svg viewBox="0 0 1000 300" preserveAspectRatio="none" className="pointer-events-none absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
+            <path d={line} fill="none" stroke="#3156ff" strokeWidth="3" vectorEffect="non-scaling-stroke" />
+          </svg>
+        )}
+        <div className={styles.points}>
+          {axis.map((label, index) => (
+            <button
+              key={`${label}-${index}`}
+              type="button"
+              className={styles.point}
+              aria-label={`${label}，消耗 ${formatMoney(values[index] ?? 0)} 元`}
+              onMouseEnter={() => setHovered(index)}
+              onFocus={() => setHovered(index)}
+              onBlur={() => setHovered(null)}
+            >
+              <span className={styles.axisLabel}>{/^\d{2}:\d{2}$/.test(label) ? `${startDate} ${label}` : label}</span>
+              {hovered === index && <span className={styles.chartTooltip}>{label}<br /><i />消耗(元)　{formatMoney(values[index] ?? 0)}</span>}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function OverviewFrame({
+  metrics,
+  metricKey,
+  selectMetric,
+  axis,
+  start,
+  end,
+  today,
+  onDateChange,
+  children,
+}: {
+  metrics: MetricView[];
+  metricKey: string;
+  selectMetric: (metric: MetricView) => void;
+  axis: string[];
+  start: string;
+  end: string;
+  today: string;
+  onDateChange: (start: string, end: string, period: PeriodKey) => void;
+  children: ReactNode;
+}) {
+  const [personalOnly, setPersonalOnly] = useState(false);
+  const currentTime = useCurrentTime();
+  const totalMetric = metrics.find((metric) => metric.key === "total");
+  const consumption = totalMetric?.indicators.find((indicator) => indicator.key === "consume")?.series ?? [];
+
+  return (
+    <section className={styles.overview} aria-labelledby="data-overview-title">
+      <div className={styles.toolbar}>
+        <div className={styles.headingGroup}>
+          <h2 id="data-overview-title">数据概览</h2>
+          <span className={styles.help} title="查看所选统计周期内的账户投放数据">?</span>
+          <label className={styles.personal}>
+            <input type="checkbox" checked={personalOnly} onChange={(event) => setPersonalOnly(event.target.checked)} />
+            仅看个人数据
+          </label>
+        </div>
+        <div className={styles.filters}>
+          <span className={styles.updated}>更新于：{currentTime.label}</span>
+          <button type="button" className={styles.refresh} onClick={refreshCurrentTime}>刷新</button>
+          <DateRangePicker start={start} end={end} today={today} onChange={onDateChange} />
+        </div>
+      </div>
+      <div className={styles.panel}>
+        <div
+          className={styles.metrics}
+          aria-label="消耗分类"
+          style={{ gridTemplateColumns: `repeat(${metrics.length}, minmax(0, 1fr))` }}
+        >
+          {metrics.map((metric, index) => (
+            <div key={metric.key} className={styles.metricWrapper}>
+              {index > 0 && <span className={styles.operator} aria-hidden="true">{index === 1 ? "=" : "+"}</span>}
+              <button type="button" className={`${styles.metric} ${metricKey === metric.key ? styles.active : ""}`} aria-pressed={metricKey === metric.key} onClick={() => selectMetric(metric)}>
+                <span className={styles.metricName}>{metric.label}</span>
+                <span className={styles.value}>{metric.value}</span>
+                <span
+                  className={styles.comparison}
+                  title={metric.comparison.estimated ? "根据相近历史数据估算" : "根据所选周期的上一等长周期计算"}
+                >
+                  相比上周期
+                  <strong className={styles[metric.comparison.direction]}>
+                    {Number(metric.value.replaceAll(",", "")) === 0 && metric.key !== "total"
+                      ? "--"
+                      : `${metric.comparison.direction === "up" ? "+" : metric.comparison.direction === "down" ? "-" : ""}${metric.comparison.percentage}`}
+                  </strong>
+                </span>
+              </button>
+              <div className={styles.metricTooltip} role="tooltip">{metric.tooltip}</div>
+            </div>
+          ))}
+        </div>
+        {metricKey === "total" ? <ConsumptionChart axis={axis} values={consumption} startDate={start} /> : <div className={styles.details}>{children}</div>}
+      </div>
+    </section>
+  );
+}

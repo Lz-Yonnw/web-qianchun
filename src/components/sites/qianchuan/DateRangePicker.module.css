@@ -1,0 +1,55 @@
+.picker { position: relative; width: 450px; font-family: Arial, "Microsoft YaHei", sans-serif; }
+.field { display: flex; align-items: center; height: 40px; padding: 0 13px; border: 1px solid transparent; border-radius: 5px; background: #f7f7f9; gap: 9px; color: #323335; }
+.field.open { border-color: #3156ff; }
+.label { color: #64666b; font-size: 16px; white-space: nowrap; margin-right: 13px; }
+.field input { min-width: 0; flex: 1; width: 110px; height: 38px; padding: 0; border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: transparent; color: #323335; outline: none !important; font-size: 16px; }
+.field input.activeInput { border-bottom-color: #3156ff; }
+.separator { font-size: 14px; color: #969aa0; }
+.field > button { color: #969aa0; padding: 3px; cursor: pointer; }
+.popup { position: absolute; top: 45px; left: 0; z-index: 45; display: flex; width: 872px; max-width: calc(100vw - 40px); background: #fff; border: 1px solid #f2f3f5; border-radius: 4px; box-shadow: 0 12px 28px #1d212912; }
+.shortcuts { width: 150px; flex-shrink: 0; padding: 4px 0; border-right: 1px solid #f2f3f5; }
+.shortcuts button { display: block; width: 100%; padding: 8px 20px; line-height: 24px; text-align: left; color: #60646e; font-size: 18px; cursor: pointer; }
+.shortcuts button:hover { color: #3156ff; background: #f2f6ff; }
+.calendars { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); min-width: 0; flex: 1; }
+.month { min-width: 0; }
+.monthHeader { display: flex; justify-content: space-between; align-items: center; height: 50px; padding: 0 14px; border-bottom: 1px solid #f2f3f5; color: #323335; font-size: 18px; }
+.monthHeader strong { font-weight: 600; white-space: nowrap; }
+.arrows { display: flex; width: 48px; gap: 5px; }
+.arrows button { width: 20px; font-size: 24px; line-height: 30px; font-weight: 300; color: #86909c; cursor: pointer; }
+.arrows button:hover { color: #3156ff; }
+.days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); padding: 10px 22px 16px; }
+.weekday { height: 45px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #60646e; }
+.day { display: flex; align-items: center; justify-content: center; height: 45px; position: relative; padding: 0; border: 0; background: #fff; color: #60646e; cursor: pointer; font-size: 16px; }
+.day span { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; position: relative; z-index: 1; }
+.day.outside { color: #bfc3cb; }
+.day.inRange::before, .day:disabled::before { position: absolute; content: ""; inset: 7.5px 0; background: #edf2ff; }
+.day:disabled { color: #bfc3cb; cursor: not-allowed; }
+.day:disabled::before { background: #f7f7f9; }
+.day:not(:disabled):hover span { background: #eaf0ff; color: #3156ff; }
+.day.selected span, .day.selected:not(:disabled):hover span { background: #3156ed; color: #fff; font-weight: 600; }
+.popup button:focus-visible { outline: 2px solid #3156ff; outline-offset: -2px; }
+.error { grid-column: 1 / -1; padding: 0 20px 12px; font-size: 12px; color: #f53f3f; }
+.compact { width: 258px; }
+.compact .field { height: 30px; gap: 5px; padding: 0 9px; }
+.compact .label { margin-right: 2px; font-size: 12px; }
+.compact .field input { width: 76px; height: 28px; font-size: 12px; }
+.compact .separator { font-size: 12px; }
+.compact .field > button { padding: 1px; }
+.compact .field > button svg { width: 14px; height: 14px; }
+.compact .popup { top: 34px; width: 650px; }
+.compact .shortcuts { width: 96px; padding: 3px 0; }
+.compact .shortcuts button { padding: 4px 14px; font-size: 13px; line-height: 20px; }
+.compact .monthHeader { height: 38px; padding: 0 10px; font-size: 14px; }
+.compact .arrows { width: 42px; gap: 2px; }
+.compact .arrows button { width: 19px; font-size: 19px; line-height: 24px; }
+.compact .days { padding: 5px 12px 10px; }
+.compact .weekday,
+.compact .day { height: 32px; font-size: 13px; }
+.compact .day span { width: 25px; height: 25px; }
+.compact .day.inRange::before,
+.compact .day:disabled::before { inset-block: 3.5px; }
+@media (max-width: 1600px) { .picker { width: 370px; } .label, .field input { font-size: 14px; } .label { margin-right: 0; } }
+@media (max-width: 1600px) { .compact { width: 258px; } .compact .label, .compact .field input { font-size: 12px; } }
+@media (max-width: 940px) { .popup { width: 740px; } .shortcuts { width: 110px; } .shortcuts button { padding-inline: 14px; font-size: 14px; } .days { padding-inline: 10px; } .monthHeader { padding-inline: 8px; font-size: 15px; } }
+@media (max-width: 940px) { .compact .popup { width: min(650px, calc(100vw - 40px)); } .compact .shortcuts { width: 96px; } .compact .shortcuts button { font-size: 13px; } .compact .monthHeader { font-size: 14px; } }
+@media (max-width: 640px) { .picker { width: 100%; } .field { gap: 5px; padding-inline: 8px; } .label, .field input { font-size: 12px; } .popup, .compact .popup { width: calc(100vw - 64px); flex-direction: column; max-height: 70vh; overflow: auto; } .shortcuts { width: 100%; display: flex; flex-wrap: wrap; border-right: 0; border-bottom: 1px solid #eee; } .shortcuts button { width: 25%; padding: 6px; text-align: center; font-size: 12px; } .calendars { grid-template-columns: 1fr; } }

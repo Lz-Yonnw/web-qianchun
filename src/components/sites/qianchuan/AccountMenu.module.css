@@ -1,0 +1,28 @@
+.root { position: relative; margin-left: 12px; padding-left: 20px; font-family: Arial, "Microsoft YaHei", sans-serif; }
+.root::before { content: ""; position: absolute; left: 0; top: 13px; height: 26px; width: 1px; background: #c4c8ce; }
+.trigger { display: flex; align-items: center; gap: 12px; width: 260px; height: 50px; padding: 5px 14px 5px 4px; border-radius: 28px; border: 0; background: transparent; text-align: left; cursor: pointer; }
+.trigger:hover, .expanded { background: #eaf0ff; }
+.avatar { display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: 38px; height: 38px; border-radius: 50%; background: #2049eb; color: white; font-size: 18px; font-weight: 600; }
+.triggerInfo { display: flex; flex: 1; min-width: 0; flex-direction: column; gap: 5px; line-height: 20px; }
+.triggerName { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #323335; font-size: 14px; }
+.triggerId { color: #969aa0; white-space: nowrap; font-size: 14px; }
+.caret { flex-shrink: 0; color: #969aa0; transition: transform .15s ease; }
+.expanded .caret { transform: rotate(180deg); }
+/* The padded bridge keeps hover active while moving from the pill to the panel. */
+.bridge { position: absolute; top: 100%; right: -22px; width: 304px; padding-top: 9px; z-index: 60; }
+.panel { overflow: hidden; border-radius: 14px; background: white; box-shadow: 0 4px 16px rgb(29 33 41 / 9%); color: #323335; }
+.summary { padding: 14px 22px 18px; border-bottom: 1px solid #e5e6eb; }
+.topline { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 14px; line-height: 22px; color: #969aa0; }
+.topline button { padding: 0; border: 0; background: none; color: #64666b; font-size: 14px; cursor: pointer; }
+.topline button:hover { color: #2a55e5; }
+.identity { display: flex; align-items: center; gap: 11px; margin-top: 13px; }
+.largeAvatar { width: 46px; height: 46px; font-size: 22px; }
+.identityText { min-width: 0; flex: 1; }
+.fullName { font-size: 14px; line-height: 22px; overflow-wrap: anywhere; }
+.accountId { margin-top: 4px; font-size: 14px; line-height: 21px; color: #969aa0; white-space: nowrap; }
+.actions { padding: 5px 22px 18px; }
+.entry { display: flex; align-items: center; min-height: 50px; font-size: 16px; line-height: 24px; }
+.manage { display: flex; align-items: center; justify-content: center; height: 38px; margin-top: 1px; border: 1px solid #dadde3; border-radius: 5px; background: #fff; color: #323335; font-size: 16px; text-decoration: none; }
+.manage:hover { color: #2a55e5; border-color: #2a55e5; background: #f7f9ff; }
+.root button:focus-visible, .manage:focus-visible { outline: 2px solid #3156ff; outline-offset: 2px; }
+@media (max-width: 1440px) { .trigger { width: 230px; gap: 8px; } .triggerName, .triggerId { font-size: 13px; } .root { padding-left: 12px; } }
