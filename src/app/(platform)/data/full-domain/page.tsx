@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState, useSyncExternalStore } from "react";
+import { useMemo, useState, useSyncExternalStore, type MouseEvent as ReactMouseEvent } from "react";
 import {
   BarChart3,
   ChevronDown,
@@ -16,6 +16,7 @@ import {
   Settings,
   ShoppingBag,
   SlidersHorizontal,
+  Trash2,
   X,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -23,6 +24,7 @@ import { PlatformHeader } from "@/components/sites/qianchuan/PlatformHeader";
 import { useCurrentTime } from "@/components/sites/qianchuan/currentTime";
 import { DateRangePicker } from "@/components/sites/qianchuan/DateRangePicker";
 import { buildAccountOverview } from "@/components/sites/qianchuan/accountOverviewData";
+import { ChartHoverCard, chartPeriod } from "@/components/sites/qianchuan/ChartHoverCard";
 import { getAccountDeliveryProfile } from "@/lib/account-delivery";
 import {
   getActiveDemoAccount,
@@ -117,15 +119,48 @@ function shiftDate(value: string, days: number) {
   return date.toISOString().slice(0, 10);
 }
 
-function SelectButton({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+function SelectButton({
+  children,
+  className = "",
+  options,
+  value,
+  onChange,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  options?: string[];
+  value?: string;
+  onChange?: (value: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
   return (
-    <button
-      type="button"
-      className={`flex h-8 items-center justify-between gap-3 rounded bg-[#f7f8fa] px-3 text-[13px] text-[#4e5969] ${className}`}
-    >
-      <span className="truncate">{children}</span>
-      <ChevronDown className="h-3.5 w-3.5 shrink-0 text-[#9aa0a9]" />
-    </button>
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+        className={`flex h-8 items-center justify-between gap-3 rounded bg-[#f7f8fa] px-3 text-[13px] text-[#4e5969] ${className}`}
+      >
+        <span className="truncate">{children}</span>
+        <ChevronDown className={`h-3.5 w-3.5 shrink-0 text-[#9aa0a9] transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && options && (
+        <div className="absolute left-0 top-[36px] z-50 min-w-full rounded bg-white py-1 shadow-[0_8px_24px_rgba(29,33,41,0.16)]">
+          {options.map((option) => (
+            <button
+              key={option}
+              type="button"
+              onClick={() => {
+                onChange?.(option);
+                setOpen(false);
+              }}
+              className={`block h-9 w-full px-3 text-left text-[13px] hover:bg-[#f7f8fa] ${option === value ? "text-[#165dff]" : "text-[#323335]"}`}
+            >
+              {option}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -446,6 +481,7 @@ function buildDouyinRows(accountId: string, dates: string[]): DouyinRow[] {
 }
 
 function TrendChart({ rows }: { rows: DouyinRow[] }) {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const width = 1120;
   const height = 286;
   const left = 42;
@@ -464,28 +500,58 @@ function TrendChart({ rows }: { rows: DouyinRow[] }) {
   const spendPoints = rows.map((row, index) => [x(index), spendY(row.spend)] as [number, number]);
   const roiPoints = rows.map((row, index) => [x(index), roiY(row.roi)] as [number, number]);
 
+  function handleMouseMove(event: ReactMouseEvent<HTMLDivElement>) {
+    if (!rows.length) return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    const chartX = (event.clientX - rect.left) / rect.width * width;
+    const step = plotWidth / Math.max(rows.length - 1, 1);
+    const index = rows.length === 1 ? 0 : Math.round((chartX - left) / step);
+    setHoveredIndex(Math.max(0, Math.min(rows.length - 1, index)));
+  }
+
+  const hoveredRow = hoveredIndex === null ? null : rows[hoveredIndex];
+  const hoveredX = hoveredIndex === null ? 0 : x(hoveredIndex);
+
   return (
-    <svg viewBox={`0 0 ${width} ${height}`} className="mt-1 block h-[286px] w-full" role="img" aria-label="整体消耗与整体支付ROI数据对比趋势">
-      <text x="6" y="17" fontSize="11" fill="#9aa0a9">整体消耗(元)</text>
-      <text x={width - 4} y="17" fontSize="11" fill="#9aa0a9" textAnchor="end">整体支付ROI</text>
-      {[0, 1, 2, 3, 4].map((step) => {
-        const y = top + step * plotHeight / 4;
-        const spendLabel = Math.round(spendCeiling * (1 - step / 4));
-        const roiLabel = (roiCeiling * (1 - step / 4)).toFixed(0);
-        return (
-          <g key={step}>
-            <line x1={left} x2={width - right} y1={y} y2={y} stroke="#e3e7ed" strokeWidth="1" />
-            <text x={left - 10} y={y + 4} fontSize="11" fill="#9aa0a9" textAnchor="end">{spendLabel}</text>
-            <text x={width - right + 10} y={y + 4} fontSize="11" fill="#9aa0a9">{roiLabel}</text>
-          </g>
-        );
-      })}
-      <path d={smoothPath(spendPoints)} fill="none" stroke="#3568ec" strokeWidth="2.6" strokeLinecap="round" />
-      <path d={smoothPath(roiPoints)} fill="none" stroke="#08c6ca" strokeWidth="2.6" strokeLinecap="round" />
-      {rows.map((row, index) => (
-        <text key={row.date} x={x(index)} y={height - 12} fontSize="11" fill="#9aa0a9" textAnchor="middle">{row.date}</text>
-      ))}
-    </svg>
+    <div className="relative mt-1 h-[286px] w-full" onMouseMove={handleMouseMove} onMouseLeave={() => setHoveredIndex(null)}>
+      <svg viewBox={`0 0 ${width} ${height}`} className="block h-full w-full" role="img" aria-label="整体消耗与整体支付ROI数据对比趋势">
+        <text x="6" y="17" fontSize="11" fill="#9aa0a9">整体消耗(元)</text>
+        <text x={width - 4} y="17" fontSize="11" fill="#9aa0a9" textAnchor="end">整体支付ROI</text>
+        {[0, 1, 2, 3, 4].map((step) => {
+          const y = top + step * plotHeight / 4;
+          const spendLabel = Math.round(spendCeiling * (1 - step / 4));
+          const roiLabel = (roiCeiling * (1 - step / 4)).toFixed(0);
+          return (
+            <g key={step}>
+              <line x1={left} x2={width - right} y1={y} y2={y} stroke="#e3e7ed" strokeWidth="1" />
+              <text x={left - 10} y={y + 4} fontSize="11" fill="#9aa0a9" textAnchor="end">{spendLabel}</text>
+              <text x={width - right + 10} y={y + 4} fontSize="11" fill="#9aa0a9">{roiLabel}</text>
+            </g>
+          );
+        })}
+        <path d={smoothPath(spendPoints)} fill="none" stroke="#3568ec" strokeWidth="2.6" strokeLinecap="round" />
+        <path d={smoothPath(roiPoints)} fill="none" stroke="#08c6ca" strokeWidth="2.6" strokeLinecap="round" />
+        {hoveredIndex !== null && spendPoints[hoveredIndex] && <circle cx={hoveredX} cy={spendPoints[hoveredIndex][1]} r="4" fill="#fff" stroke="#3568ec" strokeWidth="2" />}
+        {hoveredIndex !== null && roiPoints[hoveredIndex] && <circle cx={hoveredX} cy={roiPoints[hoveredIndex][1]} r="4" fill="#fff" stroke="#08c6ca" strokeWidth="2" />}
+        {rows.map((row, index) => (
+          <text key={row.date} x={x(index)} y={height - 12} fontSize="11" fill="#9aa0a9" textAnchor="middle">{row.date}</text>
+        ))}
+      </svg>
+      {hoveredRow && (
+        <ChartHoverCard
+          xPercent={hoveredX / width * 100}
+          title={hoveredRow.date}
+          items={[
+            { color: "#3568ec", label: "整体消耗(元)", value: formatMoney(hoveredRow.spend) },
+            { color: "#08c6ca", label: "整体支付ROI", value: hoveredRow.roi.toFixed(2) },
+          ]}
+          period={chartPeriod(hoveredRow.date)}
+          cardTop={52}
+          guideTop={38}
+          guideBottom={38}
+        />
+      )}
+    </div>
   );
 }
 
@@ -792,6 +858,7 @@ export default function FullDomainDataPage() {
   const [selectedPlatform, setSelectedPlatform] = useState("全部");
   const [deliveryMode, setDeliveryMode] = useState("放量投放");
   const [contentTab, setContentTab] = useState("直播间画面");
+  const [dateGranularity, setDateGranularity] = useState("分日");
   const [noticeVisible, setNoticeVisible] = useState(true);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -823,9 +890,17 @@ export default function FullDomainDataPage() {
               <div className="flex items-center gap-3 text-xs">
                 <span className="text-[#a0a5ad]">数据更新于 {currentTime.label}</span>
                 <button className="text-[#165dff]">刷新</button>
-                <SelectButton className="w-[96px] text-[#1d2129]">分日</SelectButton>
+                <SelectButton
+                  className="w-[96px] text-[#1d2129]"
+                  options={["汇总","分日", "分时"]}
+                  value={dateGranularity}
+                  onChange={setDateGranularity}
+                >
+                  {dateGranularity}
+                </SelectButton>
                 <DateRangePicker
                   compact
+				  showLabel={false}
                   start={resolvedStartDate}
                   end={resolvedEndDate}
                   today={currentTime.today}
@@ -942,21 +1017,21 @@ export default function FullDomainDataPage() {
 
             <div className="flex items-center justify-between">
               <div className="flex h-8 items-center rounded bg-[#f7f8fa]">
-                {contentTabs.map((tab) => (
+                {contentTabs.map((tab, index) => (
                   <button
                     key={tab}
                     type="button"
                     onClick={() => setContentTab(tab)}
-                    className={`h-8 min-w-[82px] border px-4 text-[13px] ${contentTab === tab ? "border-[#2a55e5] bg-white text-[#165dff]" : "border-transparent text-[#323335]"}`}
+                    className={`relative h-8 min-w-[82px] border px-4 text-[13px] ${contentTab === tab ? "border-[#2a55e5] bg-white text-[#165dff]" : `border-transparent text-[#323335] ${index < contentTabs.length - 1 ? "after:absolute after:right-0 after:top-1/2 after:h-4 after:w-px after:-translate-y-1/2 after:bg-[#dfe2e7]" : ""}`}`}
                   >
                     {tab}
                   </button>
                 ))}
               </div>
               <div className="flex gap-2">
-                <button type="button" className="flex h-8 w-8 items-center justify-center rounded bg-[#f7f8fa] text-[#4e5969]" aria-label="下载数据"><Download className="h-4 w-4" /></button>
-                <button type="button" className="flex h-8 w-8 items-center justify-center rounded bg-[#f7f8fa] text-[#4e5969]" aria-label="筛选"><SlidersHorizontal className="h-4 w-4" /></button>
-                <button type="button" className="flex h-8 w-8 items-center justify-center rounded bg-[#f7f8fa] text-[#4e5969]" aria-label="自定义列"><Settings className="h-4 w-4" /></button>
+                <button type="button" className="flex h-8 w-8 items-center justify-center rounded bg-[#f7f8fa] text-[#4e5969] hover:bg-[#eef0f3]" aria-label="下载数据" title="下载数据"><Download className="h-4 w-4" strokeWidth={1.6} /></button>
+                <button type="button" className="flex h-8 w-8 items-center justify-center rounded bg-[#f7f8fa] text-[#4e5969] hover:bg-[#eef0f3]" aria-label="删除" title="删除"><Trash2 className="h-4 w-4" strokeWidth={1.6} /></button>
+                <button type="button" className="flex h-8 w-8 items-center justify-center rounded bg-[#f7f8fa] text-[#4e5969] hover:bg-[#eef0f3]" aria-label="自定义列" title="自定义列"><SlidersHorizontal className="h-4 w-4" strokeWidth={1.6} /></button>
               </div>
             </div>
 

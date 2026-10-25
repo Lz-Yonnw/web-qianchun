@@ -38,12 +38,13 @@ function presets(today: string): { label: string; start: string; end: string; pe
   ];
 }
 
-export function DateRangePicker({ start, end, today, onChange, compact = false }: {
+export function DateRangePicker({ start, end, today, onChange, compact = false, showLabel = true }: {
   start: string;
   end: string;
   today: string;
   onChange: (start: string, end: string, period: PeriodKey) => void;
   compact?: boolean;
+  showLabel?: boolean;
 }) {
   const root = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
@@ -151,7 +152,7 @@ export function DateRangePicker({ start, end, today, onChange, compact = false }
       if (event.key === "Escape") { setOpen(false); trigger.current?.focus(); }
     }}>
       <div className={`${styles.field} ${open ? styles.open : ""}`}>
-        <span className={styles.label}>统计周期:</span>
+        {showLabel && <span className={styles.label}>统计周期:</span>}
         <input aria-label="开始日期" placeholder="YYYY-MM-DD" value={open ? draftStart : start} className={open && active === "start" ? styles.activeInput : ""}
           onFocus={() => show("start")} onClick={() => show("start")} onChange={(event) => setDraftStart(event.target.value)}
           onKeyDown={(event) => { if (event.key === "Enter") apply(draftStart, draftEnd); }} />

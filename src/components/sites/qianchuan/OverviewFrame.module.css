@@ -293,7 +293,7 @@
 .points {
   display: flex;
   position: absolute;
-  inset: 0 3%;
+  inset: 0;
   justify-content: space-between;
 }
 
@@ -317,26 +317,6 @@
   line-height: 18px;
   white-space: nowrap;
 }
-
-.chartTooltip {
-  position: absolute;
-  z-index: 5;
-  bottom: 15px;
-  left: 0;
-  border: 1px solid #e5e6eb;
-  border-radius: 6px;
-  background: #fff;
-  padding: 10px 14px;
-  box-shadow: 0 3px 12px #1d21291a;
-  color: #323335;
-  font-size: 13px;
-  line-height: 24px;
-  text-align: left;
-  white-space: nowrap;
-}
-
-.point:nth-last-child(-n+2) .chartTooltip { right: 0; left: auto; }
-.chartTooltip i { display: inline-block; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%; background: #3156ff; }
 
 .details { padding: 0 16px 14px; }
 .overview button:focus-visible,

@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useState, type MouseEvent as ReactMouseEvent, type ReactNode } from "react";
 import { DateRangePicker } from "./DateRangePicker";
 import { refreshCurrentTime, useCurrentTime } from "./currentTime";
 import type { MetricView, PeriodKey } from "./homeData";
 import styles from "./OverviewFrame.module.css";
+import { ChartHoverCard, chartPeriod } from "./ChartHoverCard";
 
 function formatMoney(value: number) {
   return new Intl.NumberFormat("zh-CN", { maximumFractionDigits: 2 }).format(value);
@@ -35,11 +36,22 @@ function ConsumptionChart({ axis, values, startDate }: { axis: string[]; values:
   }));
   const line = curvePath(points);
   const ticks = [1, 0.75, 0.5, 0.25, 0];
+  const fullLabel = (label: string) => /^\d{2}:\d{2}$/.test(label) ? `${startDate} ${label}` : label;
+
+  function handleMouseMove(event: ReactMouseEvent<HTMLDivElement>) {
+    if (!axis.length) return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    const ratio = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+    setHovered(axis.length === 1 ? 0 : Math.round(ratio * (axis.length - 1)));
+  }
+
+  const hoveredLabel = hovered === null ? "" : fullLabel(axis[hovered] ?? "");
+  const hoveredPercent = hovered === null || axis.length <= 1 ? 0 : hovered / (axis.length - 1) * 100;
 
   return (
     <div className={styles.chart} aria-label="账户整体消耗趋势">
       <span className={styles.unit}>消耗(元)</span>
-      <div className={styles.plot} onMouseLeave={() => setHovered(null)}>
+      <div className={styles.plot} onMouseMove={handleMouseMove} onMouseLeave={() => setHovered(null)}>
         {ticks.map((tick, index) => (
           <div key={tick} className={styles.gridline} style={{ top: `${index * 25}%` }}>
             <span>{formatMoney(maxValue * tick)}</span>
@@ -48,6 +60,7 @@ function ConsumptionChart({ axis, values, startDate }: { axis: string[]; values:
         {points.length > 0 && (
           <svg viewBox="0 0 1000 300" preserveAspectRatio="none" className="pointer-events-none absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
             <path d={line} fill="none" stroke="#3156ff" strokeWidth="3" vectorEffect="non-scaling-stroke" />
+            {hovered !== null && points[hovered] && <circle cx={points[hovered].x} cy={points[hovered].y} r="5" fill="#fff" stroke="#3156ff" strokeWidth="2" vectorEffect="non-scaling-stroke" />}
           </svg>
         )}
         <div className={styles.points}>
@@ -61,11 +74,21 @@ function ConsumptionChart({ axis, values, startDate }: { axis: string[]; values:
               onFocus={() => setHovered(index)}
               onBlur={() => setHovered(null)}
             >
-              <span className={styles.axisLabel}>{/^\d{2}:\d{2}$/.test(label) ? `${startDate} ${label}` : label}</span>
-              {hovered === index && <span className={styles.chartTooltip}>{label}<br /><i />消耗(元)　{formatMoney(values[index] ?? 0)}</span>}
+              <span className={styles.axisLabel}>{fullLabel(label)}</span>
             </button>
           ))}
         </div>
+        {hovered !== null && (
+          <ChartHoverCard
+            xPercent={hoveredPercent}
+            title={hoveredLabel}
+            items={[{ color: "#3156ff", label: "消耗(元)", value: formatMoney(values[hovered] ?? 0) }]}
+            period={chartPeriod(hoveredLabel)}
+            cardTop={20}
+            guideTop={0}
+            guideBottom={0}
+          />
+        )}
       </div>
     </div>
   );

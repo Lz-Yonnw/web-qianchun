@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type MouseEvent as ReactMouseEvent } from "react";
 import { getStandardSubTabShare } from "@/lib/account-delivery";
 import { buildAccountOverview } from "./accountOverviewData";
 import { refreshCurrentTime, useCurrentTime } from "./currentTime";
 import { DEFAULT_METRIC_KEY, type IndicatorView, type MetricView } from "./homeData";
 import { OverviewFrame } from "./OverviewFrame";
+import { ChartHoverCard, chartPeriod } from "./ChartHoverCard";
 import styles from "./DataOverview.module.css";
 
 const COLOR_LEFT = "#2f54eb";
@@ -36,6 +37,7 @@ function axisNumber(value: number) {
 }
 
 function DualAxisChart({ axis, left, right }: { axis: string[]; left?: IndicatorView; right?: IndicatorView }) {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const width = 760;
   const height = 260;
   const padLeft = 56;
@@ -56,26 +58,57 @@ function DualAxisChart({ axis, left, right }: { axis: string[]; left?: Indicator
   const rightPoints = rightSeries.map((value, index) => ({ x: x(index), y: yRight(value) }));
   const ticks = [1, 0.75, 0.5, 0.25, 0];
 
+  function handleMouseMove(event: ReactMouseEvent<HTMLDivElement>) {
+    if (count <= 0) return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    const chartX = (event.clientX - rect.left) / rect.width * width;
+    const step = innerWidth / Math.max(count - 1, 1);
+    const index = count === 1 ? 0 : Math.round((chartX - padLeft) / step);
+    setHoveredIndex(Math.max(0, Math.min(count - 1, index)));
+  }
+
+  const hoveredLabel = hoveredIndex === null ? "" : axis[hoveredIndex] ?? "";
+  const hoveredX = hoveredIndex === null ? 0 : x(hoveredIndex);
+  const tooltipItems = hoveredIndex === null ? [] : [
+    ...(left ? [{ color: COLOR_LEFT, label: left.label, value: axisNumber(leftSeries[hoveredIndex] ?? 0) }] : []),
+    ...(right ? [{ color: COLOR_RIGHT, label: right.label, value: axisNumber(rightSeries[hoveredIndex] ?? 0) }] : []),
+  ];
+
   return (
-    <svg viewBox={`0 0 ${width} ${height}`} className={styles.dualChart} aria-label="投放指标趋势图">
-      {left && <text x={5} y={20} fontSize="12" fill="#86909c">{left.label}</text>}
-      {right && <text x={width - 4} y={20} fontSize="12" fill="#86909c" textAnchor="end">{right.label}</text>}
-      {ticks.map((tick) => {
-        const y = padTop + (1 - tick) * innerHeight;
-        return (
-          <g key={tick}>
-            <line x1={padLeft} x2={width - padRight} y1={y} y2={y} stroke="#e3e7ed" />
-            {left && <text x={padLeft - 12} y={y + 4} fontSize="11" fill="#86909c" textAnchor="end">{axisNumber(maxLeft * tick)}</text>}
-            {right && <text x={width - padRight + 12} y={y + 4} fontSize="11" fill="#86909c">{axisNumber(maxRight * tick)}</text>}
-          </g>
-        );
-      })}
-      {leftPoints.length > 0 && <path d={curvePath(leftPoints)} fill="none" stroke={COLOR_LEFT} strokeWidth="3" strokeLinecap="round" vectorEffect="non-scaling-stroke" />}
-      {rightPoints.length > 0 && <path d={curvePath(rightPoints)} fill="none" stroke={COLOR_RIGHT} strokeWidth="3" strokeLinecap="round" vectorEffect="non-scaling-stroke" />}
-      {axis.map((label, index) => (
-        <text key={`${label}-${index}`} x={x(index)} y={height - 8} fontSize="11" fill="#86909c" textAnchor="middle">{label}</text>
-      ))}
-    </svg>
+    <div className={styles.dualChart} onMouseMove={handleMouseMove} onMouseLeave={() => setHoveredIndex(null)}>
+      <svg viewBox={`0 0 ${width} ${height}`} className={styles.dualChartSvg} aria-label="投放指标趋势图">
+        {left && <text x={5} y={20} fontSize="12" fill="#86909c">{left.label}</text>}
+        {right && <text x={width - 4} y={20} fontSize="12" fill="#86909c" textAnchor="end">{right.label}</text>}
+        {ticks.map((tick) => {
+          const y = padTop + (1 - tick) * innerHeight;
+          return (
+            <g key={tick}>
+              <line x1={padLeft} x2={width - padRight} y1={y} y2={y} stroke="#e3e7ed" />
+              {left && <text x={padLeft - 12} y={y + 4} fontSize="11" fill="#86909c" textAnchor="end">{axisNumber(maxLeft * tick)}</text>}
+              {right && <text x={width - padRight + 12} y={y + 4} fontSize="11" fill="#86909c">{axisNumber(maxRight * tick)}</text>}
+            </g>
+          );
+        })}
+        {leftPoints.length > 0 && <path d={curvePath(leftPoints)} fill="none" stroke={COLOR_LEFT} strokeWidth="3" strokeLinecap="round" vectorEffect="non-scaling-stroke" />}
+        {rightPoints.length > 0 && <path d={curvePath(rightPoints)} fill="none" stroke={COLOR_RIGHT} strokeWidth="3" strokeLinecap="round" vectorEffect="non-scaling-stroke" />}
+        {hoveredIndex !== null && leftPoints[hoveredIndex] && <circle cx={hoveredX} cy={leftPoints[hoveredIndex].y} r="4" fill="#fff" stroke={COLOR_LEFT} strokeWidth="2" />}
+        {hoveredIndex !== null && rightPoints[hoveredIndex] && <circle cx={hoveredX} cy={rightPoints[hoveredIndex].y} r="4" fill="#fff" stroke={COLOR_RIGHT} strokeWidth="2" />}
+        {axis.map((label, index) => (
+          <text key={`${label}-${index}`} x={x(index)} y={height - 8} fontSize="11" fill="#86909c" textAnchor="middle">{label}</text>
+        ))}
+      </svg>
+      {hoveredIndex !== null && (
+        <ChartHoverCard
+          xPercent={hoveredX / width * 100}
+          title={hoveredLabel}
+          items={tooltipItems}
+          period={chartPeriod(hoveredLabel)}
+          cardTop={58}
+          guideTop={36}
+          guideBottom={34}
+        />
+      )}
+    </div>
   );
 }
 
