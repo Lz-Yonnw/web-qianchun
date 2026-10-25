@@ -11,15 +11,15 @@ Thanks for your interest in improving the **AI Website Cloner Template**! This g
 - **Fix bugs** in the Next.js scaffold
 - **Improve documentation** — the README, `AGENTS.md`, or the skill references
 
-Browse the [open issues](https://github.com/JCodesMore/ai-website-cloner-template/issues) for something to pick up. For substantial or potentially breaking changes, consider opening an issue first so we can align on the approach before significant work begins.
+Browse the [open issues](https://github.com/Lz-Yonnw/web-qianchun/issues) for something to pick up. For substantial or potentially breaking changes, consider opening an issue first so we can align on the approach before significant work begins.
 
 ## Development setup
 
 **Prerequisites:** [Node.js](https://nodejs.org/) 24+.
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/ai-website-cloner-template.git
-cd ai-website-cloner-template
+git clone https://github.com/YOUR-USERNAME/web-qianchun.git
+cd web-qianchun
 npm ci
 ```
 

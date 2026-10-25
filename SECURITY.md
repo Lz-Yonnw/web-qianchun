@@ -15,7 +15,7 @@ Please do not disclose vulnerability details in a public issue, pull request,
 discussion, or Discord message.
 
 Use GitHub's private
-[Report a vulnerability](https://github.com/JCodesMore/ai-website-cloner-template/security/advisories/new)
+[Report a vulnerability](https://github.com/Lz-Yonnw/web-qianchun/security/advisories/new)
 form instead. Include, when available:
 
 - A clear description of the vulnerability and its potential impact
