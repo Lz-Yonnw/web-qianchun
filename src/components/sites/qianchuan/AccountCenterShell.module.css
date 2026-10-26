@@ -1,0 +1,14 @@
+.page { min-width: 1180px; height: 100vh; overflow: hidden; background: #f3f6fc; color: #1d2129; font-family: "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", Arial, sans-serif; }
+.shell { display: flex; height: calc(100vh - 80px); }
+.sidebar { width: 310px; flex: 0 0 310px; padding: 27px 30px 0; background: #f3f6fc; }
+.sideTitle { display: flex; height: 38px; align-items: center; padding: 0 29px; color: #323335; }
+.sideIcon { width: 30px; height: 30px; margin-right: 20px; }
+.sideIcon svg { display: block; width: 30px; height: 30px; }
+.sideTitle strong { font-size: 21px; line-height: 30px; font-weight: 600; white-space: nowrap; }
+.up { width: 14px; height: 14px; margin-left: auto; color: #323335; }
+.sidebar nav { display: flex; flex-direction: column; gap: 9px; margin-top: 13px; }
+.sidebar nav a, .sidebar nav button { display: flex; width: 250px; height: 50px; align-items: center; padding-left: 82px; border: 0; border-radius: 10px; background: transparent; color: #646a73; font-size: 18px; line-height: 25px; text-align: left; text-decoration: none; cursor: pointer; }
+.sidebar nav a:hover, .sidebar nav button:hover { background: rgba(255,255,255,.62); }
+.sidebar nav .active { background: #fff; color: #165dff; font-weight: 600; }
+.workspace { min-width: 0; height: 100%; flex: 1; }
+@media (max-width: 1500px) { .sidebar { width: 250px; flex-basis: 250px; padding-left: 20px; padding-right: 20px; } .sidebar nav a, .sidebar nav button { width: 210px; padding-left: 64px; } .sideTitle { padding: 0 18px; } .sideIcon { margin-right: 12px; } }

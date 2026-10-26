@@ -15,6 +15,7 @@ export function AccountMenu({ name, accountId, onLogout }: {
   const trigger = useRef<HTMLButtonElement>(null);
   const logout = useRef<HTMLButtonElement>(null);
   const accountCenterHref = `/account-center/account-info?aavid=${encodeURIComponent(accountId)}`;
+  const qualificationsHref = `/account-center/ad-qualifications?aavid=${encodeURIComponent(accountId)}`;
 
   useEffect(() => {
     if (!open) return;
@@ -74,8 +75,7 @@ export function AccountMenu({ name, accountId, onLogout }: {
               </div>
             </div>
             <div className={styles.actions}>
-              {/* Visual entries retained until their corresponding local pages exist. */}
-              <div className={styles.entry}>资质认证</div>
+              <Link href={qualificationsHref} className={styles.entry} onClick={() => setOpen(false)}>资质认证</Link>
               <div className={styles.entry}>抖音号授权</div>
               <div className={styles.entry}>全域投放授权</div>
               <Link href={accountCenterHref} className={styles.manage} onClick={() => setOpen(false)}>去账户管理</Link>
