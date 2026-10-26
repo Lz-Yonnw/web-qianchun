@@ -48,6 +48,7 @@ type SidebarItem = {
   icon: "chengfang" | "omni" | "live" | "product" | "material" | "search" | "standard";
   active?: boolean;
   collapsible?: boolean;
+  children?: string[];
 };
 
 type SidebarSection = {
@@ -74,7 +75,12 @@ const sidebarSections: SidebarSection[] = [
   },
   {
     label: "即将下线",
-    items: [{ label: "标准数据", icon: "standard", collapsible: true }],
+    items: [{
+      label: "标准数据",
+      icon: "standard",
+      collapsible: true,
+      children: ["数据概览", "标准投放数据", "直播分析", "素材分析", "人群洞察", "标签广场", "人群列表"],
+    }],
   },
 ];
 
@@ -263,6 +269,8 @@ function OptionFilter({
 }
 
 function Sidebar() {
+  const [standardOpen, setStandardOpen] = useState(true);
+
   return (
     <aside className="w-[188px] shrink-0 px-3 py-5 text-[13px]">
       {sidebarSections.map((section) => (
@@ -270,20 +278,38 @@ function Sidebar() {
           <div className="mb-2 border-b border-[#e5e6eb] px-2 pb-2 text-xs text-[#9aa0a9]">{section.label}</div>
           <div className="space-y-1">
             {section.items.map((item) => {
+              const expanded = item.collapsible && standardOpen;
+              const highlighted = item.active || expanded;
               return (
-                <button
-                  key={item.label}
-                  type="button"
-                  className={`flex h-9 w-full items-center rounded px-3 text-left font-medium transition-colors ${
-                    item.active
-                      ? "bg-white text-[#165dff] shadow-[0_1px_3px_rgba(29,33,41,0.04)]"
-                      : "text-[#323335] hover:bg-white/70"
-                  }`}
-                >
-                  <SidebarGlyph name={item.icon} className={`mr-2 ${item.active ? "text-[#2a55e5]" : "text-[#9298a1]"}`} />
-                  <span>{item.label}</span>
-                  {item.collapsible && <ChevronDown className="ml-auto h-3.5 w-3.5" />}
-                </button>
+                <div key={item.label}>
+                  <button
+                    type="button"
+                    aria-expanded={item.collapsible ? expanded : undefined}
+                    onClick={item.collapsible ? () => setStandardOpen((open) => !open) : undefined}
+                    className={`flex h-9 w-full items-center rounded px-3 text-left font-medium transition-colors ${
+                      highlighted
+                        ? "bg-white text-[#165dff] shadow-[0_1px_3px_rgba(29,33,41,0.04)]"
+                        : "text-[#323335] hover:bg-white/70"
+                    }`}
+                  >
+                    <SidebarGlyph name={item.icon} className={`mr-2 ${highlighted ? "text-[#2a55e5]" : "text-[#9298a1]"}`} />
+                    <span>{item.label}</span>
+                    {item.collapsible && <ChevronDown className={`ml-auto h-3.5 w-3.5 transition-transform ${expanded ? "rotate-180" : ""}`} />}
+                  </button>
+                  {expanded && item.children && (
+                    <div className="mt-1 space-y-1 pb-1">
+                      {item.children.map((child) => (
+                        <button
+                          key={child}
+                          type="button"
+                          className="flex h-10 w-full items-center rounded pl-11 pr-3 text-left text-[13px] font-normal text-[#323335] transition-colors hover:bg-white/70 hover:text-[#165dff]"
+                        >
+                          {child}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               );
             })}
           </div>
