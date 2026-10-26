@@ -129,7 +129,7 @@ function DiagnosisPanel({ updatedAt, accountId }: { updatedAt: string; accountId
           <span className="text-base font-bold italic text-[#1d2129]">
             专属<span className="bg-[linear-gradient(135deg,#1e62ff,#ff5757)] bg-clip-text text-transparent">诊断</span>建议
           </span>
-          <span className="text-[13px] text-[#86909c]">为更好的投放，我们建议你：</span>
+          <span className="text-[13px] text-[#86909c]">|  &nbsp;&nbsp;为更好的投放，我们建议你：</span>
         </div>
         <span className="text-xs text-[#86909c]">更新于：{updatedAt}</span>
       </div>
@@ -174,15 +174,14 @@ function DataBrief({ accountId, today }: { accountId?: string; today: string }) 
       : "text-[#4e5969]";
 
   return (
-    <section className="relative z-[1] flex min-h-[68px] items-center rounded-xl border border-[#91bcff] bg-[#f1f6ff] px-5 text-[13px] text-[#4e5969]">
-      <Image src="/sites/qianchuan/floatball.png" alt="" width={22} height={22} className="mr-2 h-[22px] w-[22px] object-contain" />
-      <strong className="mr-4 shrink-0 text-base text-[#1d2129]">数据简报</strong>
-      <p className="min-w-0">
-        近7日，您的账户消耗 <strong className="text-base text-[#3d4757]">{brief?.spend ?? "--"}元</strong>，其中整体支付ROI
+<section className="relative z-[1] top-[12px] flex min-h-[64px] items-center rounded-[10px] border border-[#91bcff] bg-[#f0f6ff] px-5 text-xs text-[#4e5969]">      <Image src="/sites/qianchuan/floatball.png" alt="" width={18} height={18} className="mr-1.5 h-[18px] w-[18px] shrink-0 object-contain" />
+      <strong className="mr-4 shrink-0 text-sm font-semibold text-[#1d2129]">数据简报</strong>
+      <p className="min-w-0 leading-5">
+        近7日，您的账户消耗 <strong className="text-sm font-semibold text-[#3d4757]">{brief?.spend ?? "--"}元</strong>，其中整体支付ROI
         {brief?.roiTrend ?? "--"}，{brief?.peerRelation ?? "--"}智能家居同行均值
-        <strong className={`ml-1 text-base ${peerColor}`}>{brief?.peerDifference ?? "--"}</strong>。
+        <strong className={`ml-1 text-sm font-semibold ${peerColor}`}>{brief?.peerDifference ?? "--"}</strong>。
       </p>
-      <button className="ml-auto shrink-0 rounded-full bg-white px-5 py-2 text-[#165dff] shadow-sm">查看详情</button>
+      <button type="button" className="ml-5 flex h-8 shrink-0 items-center rounded-full border border-[#edf1f7] bg-white px-4 text-[13px] text-[#165dff] shadow-[0_1px_2px_rgba(29,33,41,0.03)] hover:bg-[#f9fbff]">查看详情</button>
     </section>
   );
 }
@@ -210,7 +209,7 @@ export default function HomePage() {
           {/* 数据简报 + 数据概览（交互） */}
           <div className="space-y-0">
             <DataBrief accountId={account?.accountId} today={currentTime.today} />
-            <div className="-mt-px">
+            <div className="relative z-[2] -mt-px">
               <DataOverview accountId={account?.accountId} />
             </div>
           </div>
@@ -271,26 +270,26 @@ export default function HomePage() {
 
         {/* 右侧栏 */}
         <aside className="w-full shrink-0 space-y-4 lg:w-[300px] min-[1700px]:w-[400px]">
-          <Card className="p-5">
+          <Card className="!rounded-[12px] px-[23px] pb-[23px] pt-[24px]">
             <div className="flex items-center justify-between">
-              <span className="text-base font-semibold text-[#1d2129]">我的资金</span>
-              <a className="text-xs text-[#86909c]">账户明细 ›</a>
+              <span className="text-sm font-semibold text-[#1d2129]">我的资金</span>
+              <button type="button" className="inline-flex items-center gap-1 text-[13px] text-[#4e5969] hover:text-[#165dff]">账户明细<span className="text-[17px] leading-none text-[#86909c]">›</span></button>
             </div>
-            <div className="mt-3 flex items-center justify-between">
-              <span className="text-[13px] text-[#86909c]">账户余额 ⓘ</span>
-              <span className="text-base font-semibold text-[#1d2129]">{account?.balance ?? FUNDS.balance} <span className="text-xs font-normal">元</span></span>
-            </div>
-
-            <div className="mt-5 flex items-center justify-between">
-              <span className="text-base font-semibold text-[#1d2129]">活动福利</span>
-              <a className="text-xs text-[#86909c]">福利明细 ›</a>
-            </div>
-            <div className="mt-3 flex items-center justify-between">
-              <span className="text-[13px] text-[#86909c]">福利可用总余额(元) ⓘ</span>
-              <span className="text-base font-semibold text-[#1d2129]">{accountWelfare(account?.accountId)} <span className="text-xs font-normal">元</span></span>
+            <div className="mt-[14px] flex items-center justify-between">
+              <span className="inline-flex items-center gap-1 text-[13px] text-[#323335]">账户余额<span className="inline-flex h-3 w-3 items-center justify-center rounded-full bg-[#c4c7cc] text-[9px] font-semibold leading-none text-white">?</span></span>
+              <span className="text-[15px] font-semibold text-[#1d2129]">{account?.balance ?? FUNDS.balance}<span className="ml-0.5 text-[11px] font-normal text-[#4e5969]">元</span></span>
             </div>
 
-            <button className="mt-4 w-full rounded bg-[#2a55e5] py-2.5 text-sm text-white">立即充值</button>
+            <div className="mt-[24px] flex items-center justify-between">
+              <span className="text-sm font-semibold text-[#1d2129]">活动福利</span>
+              <button type="button" className="inline-flex items-center gap-1 text-[13px] text-[#4e5969] hover:text-[#165dff]">福利明细<span className="text-[17px] leading-none text-[#86909c]">›</span></button>
+            </div>
+            <div className="mt-[14px] flex items-center justify-between">
+              <span className="inline-flex items-center gap-1 text-[13px] text-[#323335]">福利可用总余额(元)<span className="inline-flex h-3 w-3 items-center justify-center rounded-full bg-[#c4c7cc] text-[9px] font-semibold leading-none text-white">?</span></span>
+              <span className="text-[15px] font-semibold text-[#1d2129]">{accountWelfare(account?.accountId)}<span className="ml-0.5 text-[11px] font-normal text-[#4e5969]">元</span></span>
+            </div>
+
+            <button type="button" className="mt-[22px] flex h-[30px] w-full items-center justify-center rounded-[3px] bg-[#3156e8] text-[13px] text-white transition-colors hover:bg-[#2448d8]">立即充值</button>
           </Card>
 
           <Card className="p-5">

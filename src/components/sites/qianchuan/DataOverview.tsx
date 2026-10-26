@@ -274,6 +274,7 @@ export function DataOverview({ accountId }: { accountId?: string }) {
             const leftSelected = indicator.key === leftKey;
             const rightSelected = indicator.key === rightKey;
             const delta = indicatorDelta(indicator);
+            const isEmpty = numericValue(indicator.value) === 0;
             return (
               <button
                 type="button"
@@ -285,8 +286,8 @@ export function DataOverview({ accountId }: { accountId?: string }) {
                 className={`${styles.indicatorCard} ${leftSelected ? styles.leftSelected : ""} ${rightSelected ? styles.rightSelected : ""}`}
               >
                 <span className={styles.indicatorLabel}>{indicator.label}</span>
-                <strong>{indicator.value}</strong>
-                <small className={styles[delta.direction]}>{delta.value}</small>
+                <strong>{isEmpty ? "--" : indicator.value}</strong>
+                <small className={isEmpty ? styles.flat : styles[delta.direction]}>{isEmpty ? "--" : delta.value}</small>
               </button>
             );
           })}

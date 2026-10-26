@@ -94,6 +94,40 @@ function ConsumptionChart({ axis, values, startDate }: { axis: string[]; values:
   );
 }
 
+const METRIC_TOOLTIP_GUIDE: Record<string, string> = {
+  chengfang: "如需查看详细数据，可前往数据-乘方数据查看",
+  standard: "如需查看详细数据，可前往数据-竞价数据-标准投放数据查看",
+  omni: "如需查看详细数据，可前往数据-竞价数据-全域数据查看",
+  brand: "如需查看详细数据，可前往数据-品牌数据查看",
+};
+
+function MetricTooltipContent({ metric }: { metric: MetricView }) {
+  if (metric.key === "total") {
+    return (
+      <>
+        <strong className={styles.tooltipTitle}>{metric.label}</strong>
+        <span className={styles.tooltipSection}>数据范围</span>
+        <p>包含本账户下，巨量千川计划和小店随心推订单投放数据，巨量千川计划包含标准投放、全域投放、品牌投放以及自然智能券。</p>
+        <span className={styles.tooltipSection}>特殊说明：</span>
+        <p>1. 品牌投放消耗数据每日20点更新，因此所选时间周期包含“今日”时，“消耗”“ROI类数据”统计值不会即时按秒发生变化；2. 当天数据会有波动，次日稳定。</p>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <strong className={styles.tooltipTitle}>{metric.label}</strong>
+      <p>{metric.key === "chengfang" ? "乘方投放期间产生的消耗。" : metric.tooltip}</p>
+      <p className={styles.tooltipGuide}>
+        {metric.key === "chengfang" && "注：若计划发生了转投（如全域转投乘方），则转投前、后计划产生的消耗都纳入乘方消耗统计范围。"}
+        {metric.key === "chengfang" && <br />}
+        {METRIC_TOOLTIP_GUIDE[metric.key]}
+        <button type="button">查看详情</button>
+      </p>
+    </>
+  );
+}
+
 export function OverviewFrame({
   metrics,
   metricKey,
@@ -161,7 +195,7 @@ export function OverviewFrame({
                   </strong>
                 </span>
               </button>
-              <div className={styles.metricTooltip} role="tooltip">{metric.tooltip}</div>
+              <div className={styles.metricTooltip} role="tooltip"><MetricTooltipContent metric={metric} /></div>
             </div>
           ))}
         </div>

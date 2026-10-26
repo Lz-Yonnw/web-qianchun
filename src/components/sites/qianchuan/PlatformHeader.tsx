@@ -10,6 +10,7 @@ import {
   getActiveDemoAccount,
   subscribeToActiveDemoAccount,
 } from "@/lib/demo-accounts";
+import { buildFullDomainHref } from "@/lib/full-domain-route";
 
 /** 巨量千川 平台顶部导航（首页 / 个人中心共用） */
 
@@ -143,7 +144,7 @@ function BrandMenu() {
 function DataMenu({ accountId }: { accountId: string }) {
   const groups: Array<{ title: string; items: Array<{ label: string; href?: string }> }> = [
     { title: "乘方", items: [{ label: "乘方数据" }] },
-    { title: "全域投放", items: [{ label: "全域数据", href: `/data/full-domain?aavid=${encodeURIComponent(accountId)}` }] },
+    { title: "全域投放", items: [{ label: "全域数据", href: buildFullDomainHref(accountId) }] },
     { title: "品牌投放", items: [{ label: "品牌竞价数据" }, { label: "品牌合约数据" }] },
   ];
 
@@ -208,9 +209,9 @@ function Submenu({ menu, accountId }: { menu: MenuKey; accountId: string }) {
   return <MarketingMenu />;
 }
 
-function TopIcon({ children }: { children: React.ReactNode }) {
+function TopIcon({ children, label }: { children: React.ReactNode; label: string }) {
   return (
-    <button type="button" className="flex h-10 w-10 items-center justify-center rounded-md text-[#8b929a] transition-colors hover:bg-white/70 hover:text-[#4e5969] [&_svg]:h-[22px] [&_svg]:w-[22px]">
+    <button type="button" aria-label={label} title={label} className="flex h-10 w-9 items-center justify-center rounded-md text-[#9299a2] transition-colors hover:bg-white/70 hover:text-[#6b737c] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2a55e5] [&_svg]:h-5 [&_svg]:w-5">
       {children}
     </button>
   );
@@ -303,41 +304,37 @@ export function PlatformHeader({ active }: { active?: string }) {
 
       {/* 右侧工具区 */}
       <div className="ml-auto flex items-center gap-1">
-        <span className="relative">
-          <TopIcon>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M20 12v8a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-8M3 7h18v5H3zM12 21V7M12 7S8 3 5.5 4.5 10 7 12 7m0 0s4-4 6.5-2.5S14 7 12 7" strokeLinejoin="round"/></svg>
-          </TopIcon>
-          <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-[#f53f3f] ring-2 ring-[#edf5ff]" />
-        </span>
-        <span className="relative">
-          <TopIcon>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5" strokeLinecap="round"/></svg>
-          </TopIcon>
-        </span>
-        <TopIcon>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2" strokeLinecap="round"/></svg>
+        <TopIcon label="福利中心">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 8h18v4H3V8Zm2 5h14v8H5v-8ZM9.8 7.2H5.7C4.2 7.2 3.4 5.6 4.2 4.4c.7-1.1 2.2-1.2 3.2-.4l2.4 2v1.2Zm4.4 0h4.1c1.5 0 2.3-1.6 1.5-2.8-.7-1.1-2.2-1.2-3.2-.4l-2.4 2v1.2Z"/><path d="M11 8h2v13h-2z" fill="#edf5ff"/></svg>
         </TopIcon>
-        <TopIcon>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.3 2.4c-.6.2-.8.6-.8 1.1v.5M12 16.5h.01" strokeLinecap="round"/></svg>
+        <TopIcon label="任务中心">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M5 2h12.2L21 5.8V20a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z"/><path d="M16.8 2v4h4M7 8.2h7M7 12h5" fill="none" stroke="#edf5ff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="m10.8 18.3 1.1-3.1 4.7-4.7 2 2-4.7 4.7-3.1 1.1Z" fill="#edf5ff"/></svg>
+        </TopIcon>
+        <TopIcon label="移动端">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="1.5" width="14" height="21" rx="2.4" fill="currentColor"/><rect x="10" y="18.5" width="4" height="1.4" rx=".7" fill="#edf5ff"/></svg>
+        </TopIcon>
+        <TopIcon label="帮助">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="currentColor"/><path d="M9.2 9.2a2.9 2.9 0 1 1 4 2.7c-.8.3-1.2.8-1.2 1.7" fill="none" stroke="#edf5ff" strokeWidth="1.8" strokeLinecap="round"/><circle cx="12" cy="16.9" r="1.1" fill="#edf5ff"/></svg>
         </TopIcon>
         <span className="relative">
-          <TopIcon>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M6 9a6 6 0 1 1 12 0c0 5 2 6 2 6H4s2-1 2-6M10 19a2 2 0 0 0 4 0" strokeLinejoin="round"/></svg>
+          <TopIcon label="通知">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a2 2 0 0 1 2 1.65A6 6 0 0 1 18 9v3.1c0 1.6.6 3.15 1.7 4.3l.3.3V18H4v-1.3l.3-.3A6.1 6.1 0 0 0 6 12.1V9a6 6 0 0 1 4-5.35A2 2 0 0 1 12 2Zm-2.2 17h4.4a2.3 2.3 0 0 1-4.4 0Z"/></svg>
           </TopIcon>
-          <span className="absolute -right-1 -top-1 rounded-full bg-[#f04444] px-1.5 text-[11px] leading-[20px] text-white">99+</span>
+          <span className="absolute -right-1 -top-0.5 min-w-[30px] rounded-full bg-[#f04444] px-1.5 text-center text-[10px] font-semibold leading-[17px] text-white">99+</span>
         </span>
 
         <AccountMenu name={accountName} accountId={accountId} onLogout={logout} />
 
         {/* 刷新 + 九宫格 */}
-        <div className="ml-3 border-l border-[#c4c8ce] pl-[29px]">
-          <div className="flex h-10 items-center gap-0.5 rounded-md bg-white px-1 text-[#687078] shadow-[0_1px_3px_rgba(29,33,41,0.04)]">
-            <TopIcon>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M20 11a8 8 0 1 0-.9 4.5M20 5v4h-4" strokeLinecap="round" strokeLinejoin="round"/></svg>
-            </TopIcon>
-            <TopIcon>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="5" r="1.6"/><circle cx="12" cy="5" r="1.6"/><circle cx="19" cy="5" r="1.6"/><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/><circle cx="5" cy="19" r="1.6"/><circle cx="12" cy="19" r="1.6"/><circle cx="19" cy="19" r="1.6"/></svg>
-            </TopIcon>
+        <div className="ml-3 border-l border-[#c4c8ce] pl-5">
+          <div className="flex h-8 w-[60px] items-center rounded-[4px] bg-white/90 text-[#727a84] shadow-[0_1px_2px_rgba(29,33,41,0.04)]">
+            <button type="button" aria-label="刷新" title="刷新" className="flex h-8 w-[30px] items-center justify-center rounded-l-[4px] hover:bg-[#f5f7fa] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2a55e5]">
+              <svg viewBox="0 0 16 16" className="h-[18px] w-[18px]" aria-hidden="true"><path fill="currentColor" d="m7.2 1.2 2.7 1.5-.8 1.4-1-.6L6.6 6 4.7 4.9l1.5-2.5-1-.6.8-1.4 1.2.8Zm4.1 4.2 2.4 4.1-1.4.8-.6-1-2.9.1V7.2l2.9-.1-.6-1 1.4-.8.8 1.1ZM7.2 14.8H2.6v-1.6h1.2L2.4 10.7l1.9-1.1 1.4 2.5.6-1 1.4.8-.5.9Z"/><circle cx="7.9" cy="8" r="1.4" fill="currentColor"/></svg>
+            </button>
+            <span className="h-4 w-px bg-[#e3e6eb]" aria-hidden="true" />
+            <button type="button" aria-label="应用菜单" title="应用菜单" className="flex h-8 w-[29px] items-center justify-center rounded-r-[4px] hover:bg-[#f5f7fa] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2a55e5]">
+              <svg viewBox="0 0 16 16" className="h-4 w-4" fill="currentColor" aria-hidden="true"><circle cx="4" cy="4" r="1.15"/><circle cx="8" cy="4" r="1.15"/><circle cx="12" cy="4" r="1.15"/><circle cx="4" cy="8" r="1.15"/><circle cx="8" cy="8" r="1.15"/><circle cx="12" cy="8" r="1.15"/><circle cx="4" cy="12" r="1.15"/><circle cx="8" cy="12" r="1.15"/><circle cx="12" cy="12" r="1.15"/></svg>
+            </button>
           </div>
         </div>
       </div>

@@ -1,31 +1,23 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState, useSyncExternalStore, type MouseEvent as ReactMouseEvent } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore, type MouseEvent as ReactMouseEvent } from "react";
 import {
-  BarChart3,
   ChevronDown,
   ChevronsUpDown,
-  CircleDot,
-  Download,
   Info,
-  Layers3,
   Maximize2,
-  Radio,
   Search,
-  Settings,
-  ShoppingBag,
   SlidersHorizontal,
-  Trash2,
   X,
 } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
 import { PlatformHeader } from "@/components/sites/qianchuan/PlatformHeader";
 import { useCurrentTime } from "@/components/sites/qianchuan/currentTime";
 import { DateRangePicker } from "@/components/sites/qianchuan/DateRangePicker";
 import { buildAccountOverview } from "@/components/sites/qianchuan/accountOverviewData";
 import { ChartHoverCard, chartPeriod } from "@/components/sites/qianchuan/ChartHoverCard";
 import { getAccountDeliveryProfile } from "@/lib/account-delivery";
+import { buildFullDomainHref } from "@/lib/full-domain-route";
 import {
   getActiveDemoAccount,
   subscribeToActiveDemoAccount,
@@ -53,7 +45,7 @@ function getDouyinProfile(accountId: string, fallbackName: string): DouyinProfil
 
 type SidebarItem = {
   label: string;
-  icon: LucideIcon;
+  icon: "chengfang" | "omni" | "live" | "product" | "material" | "search" | "standard";
   active?: boolean;
   collapsible?: boolean;
 };
@@ -67,22 +59,22 @@ const sidebarSections: SidebarSection[] = [
   {
     label: "数据概览",
     items: [
-      { label: "乘方数据", icon: Settings },
-      { label: "全域投放数据", icon: CircleDot, active: true },
+      { label: "乘方数据", icon: "chengfang" },
+      { label: "全域投放数据", icon: "omni", active: true },
     ],
   },
   {
     label: "专题数据",
     items: [
-      { label: "直播数据", icon: Radio },
-      { label: "商品数据", icon: ShoppingBag },
-      { label: "素材数据", icon: Layers3 },
-      { label: "搜索流量分析", icon: BarChart3 },
+      { label: "直播数据", icon: "live" },
+      { label: "商品数据", icon: "product" },
+      { label: "素材数据", icon: "material" },
+      { label: "搜索流量分析", icon: "search" },
     ],
   },
   {
     label: "即将下线",
-    items: [{ label: "标准数据", icon: BarChart3, collapsible: true }],
+    items: [{ label: "标准数据", icon: "standard", collapsible: true }],
   },
 ];
 
@@ -101,6 +93,34 @@ const columns = [
   "整体消耗(元)",
   "整体消耗占比",
 ];
+
+function SidebarGlyph({ name, className = "" }: { name: SidebarItem["icon"]; className?: string }) {
+  const common = `h-4 w-4 shrink-0 ${className}`;
+  if (name === "chengfang") return <svg viewBox="0 0 16 16" className={common} aria-hidden="true"><path fill="currentColor" d="m8 1.2 1.2 1.5 1.9-.3.5 1.8 1.8.7-.3 1.9 1.5 1.2-1.5 1.2.3 1.9-1.8.7-.5 1.8-1.9-.3L8 14.8l-1.2-1.5-1.9.3-.5-1.8-1.8-.7.3-1.9L1.4 8l1.5-1.2-.3-1.9 1.8-.7.5-1.8 1.9.3L8 1.2Z"/><circle cx="8" cy="8" r="2.1" fill="#f4f7fd"/></svg>;
+  if (name === "omni") return <svg viewBox="0 0 16 16" className={common} aria-hidden="true"><circle cx="8" cy="8" r="6.2" fill="currentColor"/><path d="m4.7 8.4 2.1-2.1 1.7 1.5 2.8-2.5M9.8 5.3h1.5v1.5" fill="none" stroke="#fff" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"/></svg>;
+  if (name === "live") return <svg viewBox="0 0 16 16" className={common} aria-hidden="true"><path fill="currentColor" d="M3 4.5h10l.8 8.8H2.2L3 4.5Zm2-1.2a3 3 0 0 1 6 0v1.2H9.8V3.3a1.8 1.8 0 1 0-3.6 0v1.2H5V3.3Z"/><path d="m6.6 7 3.4 2-3.4 2V7Z" fill="#fff"/></svg>;
+  if (name === "product") return <svg viewBox="0 0 16 16" className={common} aria-hidden="true"><path fill="currentColor" d="M3.1 4.6h9.8l.9 9H2.2l.9-9ZM5 4.6V3.4a3 3 0 0 1 6 0v1.2H9.8V3.4a1.8 1.8 0 1 0-3.6 0v1.2H5Z"/><circle cx="6" cy="7.2" r=".7" fill="#f4f7fd"/><circle cx="10" cy="7.2" r=".7" fill="#f4f7fd"/></svg>;
+  if (name === "material") return <svg viewBox="0 0 16 16" className={common} aria-hidden="true"><path fill="currentColor" d="m8 1.8 6.2 3.4L8 8.6 1.8 5.2 8 1.8Zm-5.5 6L8 10.9l5.5-3.1.7 1.2L8 12.5 1.8 9l.7-1.2Zm0 2.8L8 13.7l5.5-3.1.7 1.2L8 15.2l-6.2-3.4.7-1.2Z"/></svg>;
+  if (name === "search") return <svg viewBox="0 0 16 16" className={common} aria-hidden="true"><path fill="currentColor" d="M2 13.5h12v1H2v-1Zm1-4h2.2v3H3v-3Zm3.8-3h2.3v6H6.8v-6Zm3.9-4h2.3v10h-2.3v-10Z"/></svg>;
+  return <svg viewBox="0 0 16 16" className={common} aria-hidden="true"><rect x="2" y="2" width="12" height="12" rx="1.6" fill="currentColor"/><path d="M4.5 11V7.8h1.6V11H4.5Zm2.7 0V5.4h1.6V11H7.2Zm2.7 0V8.8h1.6V11H9.9Z" fill="#f4f7fd"/></svg>;
+}
+
+function TableToolbarButtons() {
+  const buttonClass = "flex h-[30px] w-[30px] items-center justify-center rounded-[4px] bg-[#f6f6f7] text-[#4e5969] transition-colors hover:bg-[#eceef1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2a55e5]";
+  return (
+    <div className="flex items-center gap-2.5">
+      <button type="button" className={buttonClass} aria-label="下载数据" title="下载数据">
+        <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none" aria-hidden="true"><path d="M8 2.5v7m0 0 2.4-2.4M8 9.5 5.6 7.1M3 10.5v2.2h10v-2.2" stroke="currentColor" strokeWidth="1.35" strokeLinecap="round" strokeLinejoin="round"/></svg>
+      </button>
+      <button type="button" className={buttonClass} aria-label="重置列宽" title="重置列宽">
+        <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none" aria-hidden="true"><path d="M3.2 4h9.6M5 4v8M11 4v8M3.5 7.2h3M9.5 7.2h3M4.5 6.2l-1 1 1 1M11.5 6.2l1 1-1 1" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"/></svg>
+      </button>
+      <button type="button" className={buttonClass} aria-label="选择列" title="选择列">
+        <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none" aria-hidden="true"><path d="M3 4h10M3 8h10M3 12h10M6 2.8v2.4M10 6.8v2.4M7 10.8v2.4" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round"/><circle cx="6" cy="4" r="1" fill="#f6f6f7" stroke="currentColor" strokeWidth="1.1"/><circle cx="10" cy="8" r="1" fill="#f6f6f7" stroke="currentColor" strokeWidth="1.1"/><circle cx="7" cy="12" r="1" fill="#f6f6f7" stroke="currentColor" strokeWidth="1.1"/></svg>
+      </button>
+    </div>
+  );
+}
 
 function buildDateRows(start: string, end: string) {
   const rows: string[] = [];
@@ -250,7 +270,6 @@ function Sidebar() {
           <div className="mb-2 border-b border-[#e5e6eb] px-2 pb-2 text-xs text-[#9aa0a9]">{section.label}</div>
           <div className="space-y-1">
             {section.items.map((item) => {
-              const Icon = item.icon;
               return (
                 <button
                   key={item.label}
@@ -261,7 +280,7 @@ function Sidebar() {
                       : "text-[#323335] hover:bg-white/70"
                   }`}
                 >
-                  <Icon className={`mr-2 h-4 w-4 ${item.active ? "text-[#2a55e5]" : "text-[#9298a1]"}`} />
+                  <SidebarGlyph name={item.icon} className={`mr-2 ${item.active ? "text-[#2a55e5]" : "text-[#9298a1]"}`} />
                   <span>{item.label}</span>
                   {item.collapsible && <ChevronDown className="ml-auto h-3.5 w-3.5" />}
                 </button>
@@ -308,6 +327,42 @@ function materialDataShare(accountId: string, businessTab: string, contentTab: s
   return businessShare * (materialContentShares[contentTab] ?? 1);
 }
 
+type DataTableSort = { index: number; direction: "ascending" | "descending" } | null;
+
+function SortableMetricHeader({
+  label,
+  index,
+  sort,
+  onSort,
+}: {
+  label: string;
+  index: number;
+  sort: DataTableSort;
+  onSort: (index: number) => void;
+}) {
+  const active = sort?.index === index;
+  const nextDirection = active && sort.direction === "descending" ? "升序" : "降序";
+  return (
+    <th
+      aria-sort={active ? sort.direction : "none"}
+      className={`w-[138px] border-r border-white px-0 text-right font-medium ${active ? "bg-[#eceef1]" : "bg-[#f5f6f7]"}`}
+    >
+      <button
+        type="button"
+        onClick={() => onSort(index)}
+        className="flex h-10 w-full items-center justify-end gap-[3px] px-3 text-[#1d2129] outline-none hover:bg-[#eceef1] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2a55e5]"
+        title={`${label}：点击${nextDirection}排列`}
+      >
+        <span className="truncate">{label}</span>
+        <svg viewBox="0 0 8 12" className="h-3 w-2 shrink-0" aria-hidden="true">
+          <path d="M4 1 7 5H1L4 1Z" fill={active && sort.direction === "ascending" ? "#2a55e5" : "#a9afb7"} />
+          <path d="m4 11-3-4h6l-3 4Z" fill={active && sort.direction === "descending" ? "#2a55e5" : "#a9afb7"} />
+        </svg>
+      </button>
+    </th>
+  );
+}
+
 function DataTable({
   storeName,
   accountId,
@@ -323,6 +378,7 @@ function DataTable({
   contentTab: string;
   dimension: string;
 }) {
+  const [sort, setSort] = useState<DataTableSort>(null);
   const profile = getDouyinProfile(accountId, storeName);
   const dataShare = dimension === "素材" ? materialDataShare(accountId, businessTab, contentTab) : 1;
   const rows = dates.map((date) => {
@@ -330,12 +386,17 @@ function DataTable({
     const metricKey = getAccountDeliveryProfile(accountId).type === "omni" ? "omni" : "standard";
     const deliveryMetric = overview.metrics.find((metric) => metric.key === metricKey);
     const indicator = (key: string) => numeric(deliveryMetric?.indicators.find((item) => item.key === key)?.value);
-    const impressions = Math.round(indicator("impr") * dataShare);
-    const clickRate = indicator("click") / 100;
+    const spend = numeric(deliveryMetric?.value) * dataShare;
+    const seed = [...`${accountId}-${date}`].reduce((sum, character) => sum + character.charCodeAt(0), 0);
+    const reportedImpressions = indicator("impr");
+    const impressions = Math.round(reportedImpressions > 0
+      ? reportedImpressions * dataShare
+      : spend * (15.7 + seed % 25 / 10));
+    const reportedClickRate = indicator("click") / 100;
+    const clickRate = reportedClickRate > 0 ? reportedClickRate : 0.026 + seed % 52 / 10_000;
     const clicks = Math.round(impressions * clickRate);
     const orders = Math.round(indicator("orders") * dataShare);
     const gmv = indicator("gmv") * dataShare;
-    const spend = numeric(deliveryMetric?.value) * dataShare;
     return { date, impressions, clicks, clickRate, orders, gmv, spend };
   });
   const totals = rows.reduce((sum, row) => ({
@@ -361,19 +422,38 @@ function DataTable({
     formatMoney(row.spend),
     `${(totals.spend > 0 ? row.spend / totals.spend * 100 : 0).toFixed(2)}%`,
   ];
+  const sortValues = (row: typeof totalRow) => [
+    row.impressions,
+    row.clicks,
+    row.clickRate,
+    row.clicks > 0 ? row.orders / row.clicks : 0,
+    row.orders,
+    row.gmv,
+    row.clicks > 0 ? row.orders / row.clicks : 0,
+    row.spend,
+    totals.spend > 0 ? row.spend / totals.spend : 0,
+  ];
+  const sortedRows = sort
+    ? [...rows].sort((left, right) => {
+        const difference = sortValues(left)[sort.index] - sortValues(right)[sort.index];
+        return sort.direction === "ascending" ? difference : -difference;
+      })
+    : rows;
+
+  function toggleSort(index: number) {
+    setSort((current) => current?.index === index
+      ? { index, direction: current.direction === "descending" ? "ascending" : "descending" }
+      : { index, direction: "descending" });
+  }
+
   return (
     <div className="overflow-x-auto border-b border-[#e5e6eb] [scrollbar-color:#8f9297_#f2f3f5] [scrollbar-width:thin]">
       <table className="min-w-[1540px] table-fixed border-collapse text-[12px] text-[#323335]">
         <thead className="bg-[#f7f8fa] text-[#1d2129]">
           <tr className="h-10">
             <th className="w-[280px] px-4 text-left font-medium">{dimension === "素材" ? contentTab : "调控数据"}</th>
-            {columns.map((column) => (
-              <th key={column} className="w-[138px] px-3 text-right font-medium">
-                <span className="inline-flex max-w-full items-center justify-end gap-1">
-                  <span className="truncate">{column}</span>
-                  <ChevronsUpDown className="h-3 w-3 shrink-0 text-[#9aa0a9]" />
-                </span>
-              </th>
+            {columns.map((column, index) => (
+              <SortableMetricHeader key={column} label={column} index={index} sort={sort} onSort={toggleSort} />
             ))}
           </tr>
         </thead>
@@ -393,7 +473,7 @@ function DataTable({
               <td key={column} className="px-3 text-right">{values(totalRow)[index]}</td>
             ))}
           </tr>
-          {rows.map((row) => (
+          {sortedRows.map((row) => (
             <tr key={row.date} className="h-[38px] border-b border-[#e5e6eb] bg-white hover:bg-[#fafbfc]">
               <td className="pl-[38px] pr-4 text-left">{row.date}</td>
               {columns.map((column, index) => (
@@ -656,11 +736,7 @@ function DouyinDataPanel({ accountId, storeName, dates }: { accountId: string; s
       <section className="mt-4 rounded-xl bg-white px-5 pb-5 pt-5">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-[#1d2129]">抖音号数据明细</h2>
-          <div className="flex gap-2">
-            <button type="button" className="flex h-8 w-8 items-center justify-center rounded bg-[#f7f8fa] text-[#4e5969]" aria-label="下载数据"><Download className="h-4 w-4" /></button>
-            <button type="button" className="flex h-8 w-8 items-center justify-center rounded bg-[#f7f8fa] text-[#4e5969]" aria-label="筛选"><SlidersHorizontal className="h-4 w-4" /></button>
-            <button type="button" className="flex h-8 w-8 items-center justify-center rounded bg-[#f7f8fa] text-[#4e5969]" aria-label="自定义列"><Settings className="h-4 w-4" /></button>
-          </div>
+          <TableToolbarButtons />
         </div>
         <div className="mt-3 overflow-x-auto border-b border-[#e5e6eb] [scrollbar-color:#8f9297_#f2f3f5] [scrollbar-width:thin]">
           <table className="min-w-[1500px] table-fixed border-collapse text-[12px] text-[#323335]">
@@ -809,11 +885,7 @@ function LiveRoomDataPanel({ accountId, storeName, dates }: { accountId: string;
       <section className="mt-4 rounded-xl bg-white px-5 pb-5 pt-5">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-[#1d2129]">直播间数据明细</h2>
-          <div className="flex gap-2">
-            <button type="button" className="flex h-8 w-8 items-center justify-center rounded bg-[#f7f8fa] text-[#4e5969]" aria-label="下载数据"><Download className="h-4 w-4" /></button>
-            <button type="button" className="flex h-8 w-8 items-center justify-center rounded bg-[#f7f8fa] text-[#4e5969]" aria-label="筛选"><SlidersHorizontal className="h-4 w-4" /></button>
-            <button type="button" className="flex h-8 w-8 items-center justify-center rounded bg-[#f7f8fa] text-[#4e5969]" aria-label="自定义列"><Settings className="h-4 w-4" /></button>
-          </div>
+          <TableToolbarButtons />
         </div>
         <div className="mt-3 overflow-x-auto border-b border-[#e5e6eb] [scrollbar-color:#8f9297_#f2f3f5] [scrollbar-width:thin]">
           <table className="min-w-[1500px] table-fixed border-collapse text-[12px] text-[#323335]">
@@ -873,11 +945,17 @@ export default function FullDomainDataPage() {
     [resolvedEndDate, resolvedStartDate],
   );
 
+  useEffect(() => {
+    if (window.location.pathname === "/data/full-domain") {
+      window.history.replaceState(null, "", buildFullDomainHref(accountId));
+    }
+  }, [accountId]);
+
   return (
     <div className="min-w-[1180px] bg-[#f4f7fd]">
       <PlatformHeader active="数据" />
 
-      <div className="mx-auto flex min-h-[calc(100vh-80px)] max-w-[1412px]">
+      <div className="mx-auto flex min-h-[calc(100vh-80px)] max-w-[1600px]">
         <Sidebar />
 
         <main className="min-w-0 flex-1 pb-8">
@@ -1028,11 +1106,7 @@ export default function FullDomainDataPage() {
                   </button>
                 ))}
               </div>
-              <div className="flex gap-2">
-                <button type="button" className="flex h-8 w-8 items-center justify-center rounded bg-[#f7f8fa] text-[#4e5969] hover:bg-[#eef0f3]" aria-label="下载数据" title="下载数据"><Download className="h-4 w-4" strokeWidth={1.6} /></button>
-                <button type="button" className="flex h-8 w-8 items-center justify-center rounded bg-[#f7f8fa] text-[#4e5969] hover:bg-[#eef0f3]" aria-label="删除" title="删除"><Trash2 className="h-4 w-4" strokeWidth={1.6} /></button>
-                <button type="button" className="flex h-8 w-8 items-center justify-center rounded bg-[#f7f8fa] text-[#4e5969] hover:bg-[#eef0f3]" aria-label="自定义列" title="自定义列"><SlidersHorizontal className="h-4 w-4" strokeWidth={1.6} /></button>
-              </div>
+              <TableToolbarButtons />
             </div>
 
             <div className="mt-3">
