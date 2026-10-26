@@ -309,7 +309,7 @@
 .licensePreview {
   position: fixed;
   z-index: 80;
-  top: 80px;
+  top: calc(80px / var(--qc-account-center-scale, 1));
   right: 30px;
   bottom: 30px;
   left: 310px;
@@ -402,7 +402,6 @@
 
 @media (max-width: 1500px) {
   .licensePreview {
-    top: calc(80px / var(--qc-desktop-scale));
     left: 250px;
   }
   .previewImage { right: 42px; left: 42px; }

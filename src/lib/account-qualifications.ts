@@ -31,33 +31,33 @@ export const ACCOUNT_QUALIFICATION_PROFILES: Record<string, AccountQualification
     companyName: "广西君宝颜食品有限公司",
     licenseNumber: "91451481MA5NAUCY8M",
     certificateValidity: "无截止日期",
-    registeredAddress: "中国-广西壮族自治区-崇左",
+    registeredAddress: "中国-广西-崇左",
     approvedAt: "2020-07-11 14:05:00",
     email: "未提供",
     phone: "18778986998",
     representative: "黄长云",
     entityType: "企业",
-    licenseImage: "/sites/qianchuan/licenses/91451481MA5NAUCY8M.jpg",
+    licenseImage: "/sites/qianchuan/licenses/91451481MA5NAUCY8M.png",
   },
   "1696541369393160": {
     accountId: "1696541369393160",
     companyName: "南宁市西贡咖啡食品有限公司",
     licenseNumber: "91450100581996802K",
     certificateValidity: "无截止日期",
-    registeredAddress: "广西壮族自治区南宁市",
+    registeredAddress: "中国-广西-南宁",
     approvedAt: "2020-09-21 15:10:00",
     email: "未提供",
     phone: "18076591886",
     representative: "陈嘉俊",
     entityType: "企业",
-    licenseImage: "/sites/qianchuan/licenses/91450100581996802K.jpg",
+    licenseImage: "/sites/qianchuan/licenses/91450100581996802K.png",
   },
   "1851377284049928": {
     accountId: "1851377284049928",
     companyName: "广西自由森林食品有限公司",
     licenseNumber: "91450304MAK3CCB63E",
     certificateValidity: "无截止日期",
-    registeredAddress: "广西壮族自治区南宁市",
+    registeredAddress: "中国-广西-南宁",
     approvedAt: "2026-06-23 13:09:00",
     email: "未提供",
     phone: "13760158898",
@@ -70,7 +70,7 @@ export const ACCOUNT_QUALIFICATION_PROFILES: Record<string, AccountQualification
     companyName: "广西宇峰食品有限公司",
     licenseNumber: "91451423MA5NP6HN6G",
     certificateValidity: "无截止日期",
-    registeredAddress: "广西壮族自治区崇左市",
+    registeredAddress: "中国-广西-崇左",
     approvedAt: "2022-10-23 14:04:00",
     email: "未提供",
     phone: "18070730864",
@@ -146,4 +146,9 @@ export function qualificationCertificateType(profile: AccountQualificationProfil
 
 export function maskQualificationPhone(phone: string) {
   return `${phone.slice(0, 3)}****${phone.slice(-4)}`;
+}
+
+export function maskQualificationRepresentative(representative: string) {
+  if (!representative) return "--";
+  return `${representative.slice(0, 1)}${"*".repeat(Math.max(1, representative.length - 1))}`;
 }

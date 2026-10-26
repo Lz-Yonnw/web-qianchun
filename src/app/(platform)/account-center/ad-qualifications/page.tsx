@@ -18,6 +18,7 @@ import {
 import {
   getAccountQualificationProfile,
   maskQualificationPhone,
+  maskQualificationRepresentative,
   qualificationCertificateType,
   type AccountQualificationProfile,
 } from "@/lib/account-qualifications";
@@ -273,7 +274,7 @@ function SubjectDetails({ profile, onBack }: { profile: AccountQualificationProf
           <div><dt>统一社会信用代码</dt><dd>{profile.licenseNumber}</dd></div>
           <div><dt>证件有效日期</dt><dd>{profile.certificateValidity}</dd></div>
           <div><dt>注册地</dt><dd>{profile.registeredAddress}</dd></div>
-          <div><dt>法定代表人/经营者</dt><dd>{profile.representative}</dd></div>
+          <div><dt>法定代表人/经营者</dt><dd>{maskQualificationRepresentative(profile.representative)}</dd></div>
         </dl>
       </section>
       <div className={styles.detailFooter}>
