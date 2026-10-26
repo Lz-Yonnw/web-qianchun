@@ -25,4 +25,15 @@
 .manage { display: flex; align-items: center; justify-content: center; height: 38px; margin-top: 1px; border: 1px solid #dadde3; border-radius: 5px; background: #fff; color: #323335; font-size: 16px; text-decoration: none; }
 .manage:hover { color: #2a55e5; border-color: #2a55e5; background: #f7f9ff; }
 .root button:focus-visible, .manage:focus-visible { outline: 2px solid #3156ff; outline-offset: 2px; }
-@media (max-width: 1440px) { .trigger { width: 230px; gap: 8px; } .triggerName, .triggerId { font-size: 13px; } .root { padding-left: 12px; } }
+@media (max-width: 1500px) {
+  .root { margin-left: 6px; padding-left: 10px; }
+  .trigger { width: 180px; gap: 8px; padding-right: 8px; }
+  .triggerName, .triggerId { font-size: 12px; }
+  .avatar { width: 34px; height: 34px; font-size: 16px; }
+}
+
+@media (max-width: 1180px) {
+  .trigger { width: 138px; }
+  .triggerId { display: none; }
+  .triggerInfo { justify-content: center; }
+}

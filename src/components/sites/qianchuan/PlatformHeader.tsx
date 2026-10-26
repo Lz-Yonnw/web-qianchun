@@ -235,7 +235,7 @@ export function PlatformHeader({ active }: { active?: string }) {
 
   return (
     <header
-      className="sticky top-0 z-30 flex h-20 min-w-[1180px] items-center bg-[#edf5ff] px-[30px] shadow-[0_1px_0_rgba(29,33,41,0.08)]"
+      className="qc-adaptive-header sticky top-0 z-30 flex h-20 min-w-[1180px] items-center bg-[#edf5ff] px-[30px] shadow-[0_1px_0_rgba(29,33,41,0.08)]"
       onMouseLeave={() => setOpenMenu(null)}
       onKeyDown={(event) => {
         if (event.key === "Escape") setOpenMenu(null);

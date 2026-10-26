@@ -138,9 +138,75 @@
   --qc-sub-2: #969aa0;
   --qc-page: #f2f3f5;
   --qc-line: #e5e6eb;
+  --qc-desktop-scale: 1;
+  --qc-desktop-scale-inverse: 100%;
 }
 
 .qc-cn {
   font-family: "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB",
     -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+/*
+ * The source product is designed on a 1920px desktop canvas. Keep the shared
+ * chrome and the account workspace on the same responsive scale at narrower
+ * desktop widths so route changes never make the interface jump in size.
+ */
+.qc-adaptive-header {
+  width: 100%;
+}
+
+@media (max-width: 1500px) {
+  :root {
+    --qc-desktop-scale: 0.8;
+    --qc-desktop-scale-inverse: 125%;
+  }
+
+  .qc-adaptive-header {
+    width: 100% !important;
+    height: 80px !important;
+    min-width: 0 !important;
+    padding-right: 16px !important;
+    padding-left: 16px !important;
+  }
+
+  .qc-adaptive-header > a:first-of-type {
+    margin-right: 14px !important;
+  }
+
+  .qc-adaptive-header > a:first-of-type img {
+    width: 140px !important;
+    height: 45px !important;
+  }
+
+  .qc-adaptive-header > nav {
+    gap: 6px !important;
+    font-size: 14px !important;
+  }
+
+  .qc-adaptive-header > nav > div > a > span,
+  .qc-adaptive-header > nav > div > button > span {
+    padding-right: 6px !important;
+    padding-left: 6px !important;
+  }
+
+  .qc-adaptive-header > nav + div {
+    gap: 0 !important;
+  }
+
+  .qc-adaptive-header > nav + div > button,
+  .qc-adaptive-header > nav + div > span > button {
+    width: 30px !important;
+  }
+}
+
+@media (max-width: 1180px) {
+  :root {
+    --qc-desktop-scale: 0.72;
+    --qc-desktop-scale-inverse: 138.8889%;
+  }
+
+  .qc-adaptive-header > nav { gap: 2px !important; font-size: 13px !important; }
+  .qc-adaptive-header > a:first-of-type { margin-right: 8px !important; }
+  .qc-adaptive-header > a:first-of-type img { width: 128px !important; }
 }

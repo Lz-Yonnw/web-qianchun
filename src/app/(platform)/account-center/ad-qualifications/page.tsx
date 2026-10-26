@@ -1,6 +1,27 @@
 "use client";
 
-import { useRef, useState } from "react";
+import Image from "next/image";
+import { useRef, useState, useSyncExternalStore } from "react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  Maximize2,
+  MoveHorizontal,
+  MoveVertical,
+  RotateCcw,
+  RotateCw,
+  Undo2,
+  ZoomIn,
+  ZoomOut,
+} from "lucide-react";
+import {
+  getAccountQualificationProfile,
+  maskQualificationPhone,
+  qualificationCertificateType,
+  type AccountQualificationProfile,
+} from "@/lib/account-qualifications";
+import { getActiveDemoAccount, subscribeToActiveDemoAccount } from "@/lib/demo-accounts";
 import styles from "./page.module.css";
 
 type IconName = "subject" | "verification" | "seal" | "delivery";
@@ -157,25 +178,69 @@ function QualificationCard({ card, onOpen }: { card: (typeof CARDS)[number]; onO
   );
 }
 
-function LicenseThumbnail() {
+function LicenseThumbnail({
+  profile,
+  onOpen,
+}: {
+  profile: AccountQualificationProfile;
+  onOpen: () => void;
+}) {
   return (
-    <div className={styles.licenseThumb} aria-label="营业执照缩略图">
-      <div className={styles.licenseEmblem}>●</div>
-      <strong>营 业 执 照</strong>
-      <span>统一社会信用代码</span>
-      <i />
-      <i />
-      <i />
-      <small>南康区巧屋优选家具销售中心</small>
-      <b>巧屋优选</b>
-    </div>
+    <button type="button" className={styles.licenseThumb} onClick={onOpen} aria-label={`查看${profile.companyName}营业执照`}>
+      <Image src={profile.licenseImage} alt={`${profile.companyName}营业执照`} width={150} height={150} sizes="150px" />
+      <span>点击查看</span>
+    </button>
   );
 }
 
-function SubjectDetails({ onBack }: { onBack: () => void }) {
+function LicensePreview({ profile, onClose }: { profile: AccountQualificationProfile; onClose: () => void }) {
+  const [zoom, setZoom] = useState(1);
+  const [rotation, setRotation] = useState(0);
+
+  function resetView() {
+    setZoom(1);
+    setRotation(0);
+  }
+
+  return (
+    <aside className={styles.licensePreview} role="dialog" aria-modal="false" aria-label={`${profile.companyName}营业执照预览`}>
+      <div className={styles.previewCounter}>一共 1 张，当前第 1 张</div>
+      <button type="button" className={styles.previewClose} onClick={onClose} aria-label="关闭营业执照预览">×</button>
+      <div className={styles.previewImage}>
+        <Image
+          src={profile.licenseImage}
+          alt={`${profile.companyName}营业执照大图`}
+          fill
+          sizes="(max-width: 1500px) calc(100vw - 250px), calc(100vw - 310px)"
+          priority
+          style={{ transform: `scale(${zoom}) rotate(${rotation}deg)` }}
+        />
+      </div>
+      <div className={styles.previewToolbar} aria-label="营业执照查看工具">
+        <button type="button" title="放大" aria-label="放大" onClick={() => setZoom((value) => Math.min(2.5, value + 0.15))}><ZoomIn /></button>
+        <button type="button" title="缩小" aria-label="缩小" onClick={() => setZoom((value) => Math.max(.45, value - 0.15))}><ZoomOut /></button>
+        <button type="button" title="向左旋转90°" aria-label="向左旋转90度" onClick={() => setRotation((value) => value - 90)}><RotateCcw /></button>
+        <button type="button" title="向右旋转90°" aria-label="向右旋转90度" onClick={() => setRotation((value) => value + 90)}><RotateCw /></button>
+        <button type="button" title="还原" aria-label="还原" onClick={resetView}><Undo2 /></button>
+        <button type="button" title="上一张" aria-label="上一张" disabled><ChevronLeft /></button>
+        <button type="button" title="下一张" aria-label="下一张" disabled><ChevronRight /></button>
+        <button type="button" title="适应宽度" aria-label="适应宽度" onClick={() => setZoom(1.08)}><MoveHorizontal /></button>
+        <button type="button" title="适应高度" aria-label="适应高度" onClick={() => setZoom(.92)}><MoveVertical /></button>
+        <button type="button" title="适应窗口" aria-label="适应窗口" onClick={resetView}><Maximize2 /></button>
+        <a href={profile.licenseImage} download title="下载" aria-label="下载营业执照"><Download /></a>
+      </div>
+      <div className={styles.previewThumb} aria-hidden="true">
+        <Image src={profile.licenseImage} alt="" fill sizes="52px" />
+      </div>
+    </aside>
+  );
+}
+
+function SubjectDetails({ profile, onBack }: { profile: AccountQualificationProfile; onBack: () => void }) {
+  const [previewOpen, setPreviewOpen] = useState(false);
   const rows = [
-    ["公司名称", "南康区巧屋优选家具销售中心"],
-    ["证件类型", "个体工商户/个体工商户营业执照统一社会信用代码"],
+    ["公司名称", profile.companyName],
+    ["证件类型", qualificationCertificateType(profile)],
     ["营业执照类型", "纸质营业执照"],
   ];
 
@@ -204,16 +269,17 @@ function SubjectDetails({ onBack }: { onBack: () => void }) {
           {rows.map(([label, value]) => (
             <div key={label}><dt>{label}</dt><dd>{value}</dd></div>
           ))}
-          <div className={styles.photoRow}><dt>营业执照照片</dt><dd><LicenseThumbnail /></dd></div>
-          <div><dt>统一社会信用代码</dt><dd>92360782MABPUH6249</dd></div>
-          <div><dt>证件有效日期</dt><dd>无截止日期</dd></div>
-          <div><dt>注册地</dt><dd>中国-江西-赣州</dd></div>
-          <div><dt>法定代表人/经营者</dt><dd>邓**</dd></div>
+          <div className={styles.photoRow}><dt>营业执照照片</dt><dd><LicenseThumbnail profile={profile} onOpen={() => setPreviewOpen(true)} /></dd></div>
+          <div><dt>统一社会信用代码</dt><dd>{profile.licenseNumber}</dd></div>
+          <div><dt>证件有效日期</dt><dd>{profile.certificateValidity}</dd></div>
+          <div><dt>注册地</dt><dd>{profile.registeredAddress}</dd></div>
+          <div><dt>法定代表人/经营者</dt><dd>{profile.representative}</dd></div>
         </dl>
       </section>
       <div className={styles.detailFooter}>
         <button type="button" onClick={onBack}>回认证首页</button>
       </div>
+      {previewOpen && <LicensePreview profile={profile} onClose={() => setPreviewOpen(false)} />}
     </>
   );
 }
@@ -366,13 +432,13 @@ function DeliveryQualificationDetails({ onBack }: { onBack: () => void }) {
   );
 }
 
-function CorporateVerificationDetails({ onBack }: { onBack: () => void }) {
+function CorporateVerificationDetails({ profile, onBack }: { profile: AccountQualificationProfile; onBack: () => void }) {
   const rows = [
     ["验证方式", "授权验证"],
-    ["验证类型", "个体工商户"],
-    ["公司名称", "南康区巧屋优选家具销售中心"],
-    ["授权账户", "54****60（抖店商家后台）"],
-    ["通过时间", "2026-05-20 13:02:31"],
+    ["验证类型", profile.entityType],
+    ["公司名称", profile.companyName],
+    ["授权账户", `${maskQualificationPhone(profile.phone)}（抖店商家后台）`],
+    ["通过时间", profile.approvedAt],
   ];
 
   return (
@@ -412,6 +478,8 @@ function CorporateVerificationDetails({ onBack }: { onBack: () => void }) {
 export default function AdQualificationsPage() {
   const [panel, setPanel] = useState<"overview" | "subject" | "verification" | "signature" | "delivery">("overview");
   const mainRef = useRef<HTMLDivElement>(null);
+  const activeAccount = useSyncExternalStore(subscribeToActiveDemoAccount, getActiveDemoAccount, () => null);
+  const profile = getAccountQualificationProfile(activeAccount?.accountId);
 
   function showPanel(nextPanel: "overview" | "subject" | "verification" | "signature" | "delivery") {
     setPanel(nextPanel);
@@ -421,9 +489,9 @@ export default function AdQualificationsPage() {
   return (
     <div ref={mainRef} className={styles.main}>
           {panel === "subject" ? (
-            <SubjectDetails onBack={() => showPanel("overview")} />
+            <SubjectDetails profile={profile} onBack={() => showPanel("overview")} />
           ) : panel === "verification" ? (
-            <CorporateVerificationDetails onBack={() => showPanel("overview")} />
+            <CorporateVerificationDetails profile={profile} onBack={() => showPanel("overview")} />
           ) : panel === "signature" ? (
             <SignatureDetails onBack={() => showPanel("overview")} />
           ) : panel === "delivery" ? (
