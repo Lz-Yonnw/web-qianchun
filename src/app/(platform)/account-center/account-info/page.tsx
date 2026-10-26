@@ -82,6 +82,7 @@ export default function AccountInfoPage() {
                 <button
                   type="button"
                   key={item}
+                  data-auth-required={active ? undefined : ""}
                   className={`flex h-9 w-full items-center rounded-lg pl-[58px] text-left transition-colors ${
                     active ? "bg-white font-medium text-[#165dff] shadow-[0_1px_3px_rgba(29,33,41,0.03)]" : "text-[#646a73] hover:bg-white/60"
                   }`}
@@ -102,7 +103,7 @@ export default function AccountInfoPage() {
             <div className="w-[432px] max-w-full">
               <Field label="账户名称">
                 <div className="text-[13px] leading-5 text-[#1d2129]">
-                  {account.name} <button type="button" className="ml-1 text-[#165dff]">修改</button>
+                  {account.name} <button type="button" data-auth-required className="ml-1 text-[#165dff]">修改</button>
                 </div>
               </Field>
 
@@ -123,7 +124,7 @@ export default function AccountInfoPage() {
 
               <Field label="我的角色">
                 <div className="-mt-[27px] ml-[55px] flex justify-end">
-                  <button type="button" className="text-xs text-[#165dff]">如何找到千川超管?</button>
+                  <button type="button" data-auth-required className="text-xs text-[#165dff]">如何找到千川超管?</button>
                 </div>
                 <div className="mt-[10px] flex items-center gap-1 text-[13px] text-[#1d2129]">
                   管理员 <HelpCircle className="h-3.5 w-3.5 fill-[#aeb3bb] text-white" />
@@ -136,7 +137,7 @@ export default function AccountInfoPage() {
                   <div className="flex h-8 items-center">
                     <span className="flex w-[105px] items-center gap-3 text-[#323335]"><Smartphone className="h-4 w-4 text-[#676d75]" />手机号</span>
                     <span className="text-[#4e5969]">{account.phone}</span>
-                    <button type="button" className="ml-auto flex items-center gap-1 text-[#165dff]">去修改 <ExternalLink className="h-3.5 w-3.5" /></button>
+                    <button type="button" data-auth-required className="ml-auto flex items-center gap-1 text-[#165dff]">去修改 <ExternalLink className="h-3.5 w-3.5" /></button>
                   </div>
                   <div className="flex h-8 items-center">
                     <span className="flex w-[105px] items-center gap-3 text-[#323335]"><Link2 className="h-4 w-4 text-[#676d75]" />第三方账号</span>
@@ -164,7 +165,7 @@ export default function AccountInfoPage() {
                     我已阅读并同意
                     {AGREEMENTS.map((a, i) => (
                       <span key={a}>
-                        <a className="text-[#165dff]">《{a}》</a>
+                        <a data-auth-required className="text-[#165dff]">《{a}》</a>
                         {i < AGREEMENTS.length - 1 ? "、" : ""}
                       </span>
                     ))}

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { findDemoAccount, setActiveDemoAccount } from "@/lib/demo-accounts";
 
@@ -43,6 +43,20 @@ export default function LoginPage() {
   const [agreed, setAgreed] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const [error, setError] = useState("");
+  const [authFailed, setAuthFailed] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("authError") !== "1") return;
+
+    window.history.replaceState(null, "", window.location.pathname);
+    const showTimer = window.setTimeout(() => setAuthFailed(true), 0);
+    const hideTimer = window.setTimeout(() => setAuthFailed(false), 3600);
+    return () => {
+      window.clearTimeout(showTimer);
+      window.clearTimeout(hideTimer);
+    };
+  }, []);
 
   function sendCode() {
     if (countdown > 0) return;
@@ -85,6 +99,12 @@ export default function LoginPage() {
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden">
+      {authFailed && (
+        <div role="alert" className="fixed right-10 top-14 z-[100] flex h-12 min-w-[142px] items-center gap-2 rounded-lg bg-white px-4 text-sm text-[#323335] shadow-[0_8px_28px_rgba(29,33,41,0.14)]">
+          <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#f53f3f] text-[10px] font-bold leading-none text-white">×</span>
+          用户鉴权失败
+        </div>
+      )}
       {/* 主视觉背景图 */}
       <Image
         src="/sites/qianchuan/login-hero.jpg"

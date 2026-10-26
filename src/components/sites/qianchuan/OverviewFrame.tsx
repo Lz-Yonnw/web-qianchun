@@ -122,7 +122,7 @@ function MetricTooltipContent({ metric }: { metric: MetricView }) {
         {metric.key === "chengfang" && "注：若计划发生了转投（如全域转投乘方），则转投前、后计划产生的消耗都纳入乘方消耗统计范围。"}
         {metric.key === "chengfang" && <br />}
         {METRIC_TOOLTIP_GUIDE[metric.key]}
-        <button type="button">查看详情</button>
+        <button type="button" data-auth-required>查看详情</button>
       </p>
     </>
   );

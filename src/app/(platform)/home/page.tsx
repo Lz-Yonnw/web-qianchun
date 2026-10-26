@@ -49,7 +49,7 @@ function NoticeBar() {
       </span>
       <span>
         根据工信部新规要求，2026年10月30日起签署电子合同必须先申请数字证书，请您尽快完成数字证书申请，证书申请后电子签将为您签发电子签章。
-        <button className="ml-2 text-[#165dff]">链接</button>
+        <button data-auth-required className="ml-2 text-[#165dff]">链接</button>
       </span>
     </div>
   );
@@ -99,7 +99,7 @@ function SuggestionCard({ title, description, action, extra, tags = [] }: Sugges
           ))}
         </div>
       )}
-      <button className="relative z-10 mt-auto w-fit rounded border border-[#d8dbe2] bg-white px-4 py-1.5 text-[13px] text-[#1d2129]">
+      <button data-auth-required className="relative z-10 mt-auto w-fit rounded border border-[#d8dbe2] bg-white px-4 py-1.5 text-[13px] text-[#1d2129]">
         {action}
       </button>
       <div className="pointer-events-none absolute -bottom-3 right-2 flex h-16 w-16 items-center justify-center rounded-xl bg-white/45 text-5xl font-bold text-white/90">
@@ -139,7 +139,7 @@ function DiagnosisPanel({ updatedAt, accountId }: { updatedAt: string; accountId
           title="一键托管全店，提升店铺生意"
           description="系统自动筛选店铺可投的潜力商品和抖音号，投放即享"
           action="立即投放"
-          extra={<button className="text-xs font-normal text-[#1677ff]">🌐 了解更多</button>}
+          extra={<button data-auth-required className="text-xs font-normal text-[#1677ff]">🌐 了解更多</button>}
           tags={[
             { label: "保障福利", tone: "green" },
             { label: "智能优惠券", tone: "red" },
@@ -181,7 +181,7 @@ function DataBrief({ accountId, today }: { accountId?: string; today: string }) 
         {brief?.roiTrend ?? "--"}，{brief?.peerRelation ?? "--"}智能家居同行均值
         <strong className={`ml-1 text-sm font-semibold ${peerColor}`}>{brief?.peerDifference ?? "--"}</strong>。
       </p>
-      <button type="button" className="ml-5 flex h-8 shrink-0 items-center rounded-full border border-[#edf1f7] bg-white px-4 text-[13px] text-[#165dff] shadow-[0_1px_2px_rgba(29,33,41,0.03)] hover:bg-[#f9fbff]">查看详情</button>
+      <button type="button" data-auth-required className="ml-5 flex h-8 shrink-0 items-center rounded-full border border-[#edf1f7] bg-white px-4 text-[13px] text-[#165dff] shadow-[0_1px_2px_rgba(29,33,41,0.03)] hover:bg-[#f9fbff]">查看详情</button>
     </section>
   );
 }
@@ -237,7 +237,7 @@ export default function HomePage() {
                     </div>
                   ))}
                 </div>
-                <button className="mt-6 w-full rounded bg-[#2a55e5] py-2.5 text-sm text-white">创建全域投放</button>
+                <button data-auth-required className="mt-6 w-full rounded bg-[#2a55e5] py-2.5 text-sm text-white">创建全域投放</button>
               </div>
               {/* 右：GMV 对比图 */}
               <div>
@@ -273,7 +273,7 @@ export default function HomePage() {
           <Card className="!rounded-[12px] px-[23px] pb-[23px] pt-[24px]">
             <div className="flex items-center justify-between">
               <span className="text-sm font-semibold text-[#1d2129]">我的资金</span>
-              <button type="button" className="inline-flex items-center gap-1 text-[13px] text-[#4e5969] hover:text-[#165dff]">账户明细<span className="text-[17px] leading-none text-[#86909c]">›</span></button>
+              <button type="button" data-auth-required className="inline-flex items-center gap-1 text-[13px] text-[#4e5969] hover:text-[#165dff]">账户明细<span className="text-[17px] leading-none text-[#86909c]">›</span></button>
             </div>
             <div className="mt-[14px] flex items-center justify-between">
               <span className="inline-flex items-center gap-1 text-[13px] text-[#323335]">账户余额<span className="inline-flex h-3 w-3 items-center justify-center rounded-full bg-[#c4c7cc] text-[9px] font-semibold leading-none text-white">?</span></span>
@@ -282,14 +282,14 @@ export default function HomePage() {
 
             <div className="mt-[24px] flex items-center justify-between">
               <span className="text-sm font-semibold text-[#1d2129]">活动福利</span>
-              <button type="button" className="inline-flex items-center gap-1 text-[13px] text-[#4e5969] hover:text-[#165dff]">福利明细<span className="text-[17px] leading-none text-[#86909c]">›</span></button>
+              <button type="button" data-auth-required className="inline-flex items-center gap-1 text-[13px] text-[#4e5969] hover:text-[#165dff]">福利明细<span className="text-[17px] leading-none text-[#86909c]">›</span></button>
             </div>
             <div className="mt-[14px] flex items-center justify-between">
               <span className="inline-flex items-center gap-1 text-[13px] text-[#323335]">福利可用总余额(元)<span className="inline-flex h-3 w-3 items-center justify-center rounded-full bg-[#c4c7cc] text-[9px] font-semibold leading-none text-white">?</span></span>
-              <span className="text-[15px] font-semibold text-[#1d2129]">{accountWelfare(account?.accountId)}<span className="ml-0.5 text-[11px] font-normal text-[#4e5969]">元</span></span>
+              <span className="text-[15px] font-semibold text-[#1d2129]">0.00<span className="ml-0.5 text-[11px] font-normal text-[#4e5969]">元</span></span>
             </div>
 
-            <button type="button" className="mt-[22px] flex h-[30px] w-full items-center justify-center rounded-[3px] bg-[#3156e8] text-[13px] text-white transition-colors hover:bg-[#2448d8]">立即充值</button>
+            <button type="button" data-auth-required className="mt-[22px] flex h-[30px] w-full items-center justify-center rounded-[3px] bg-[#3156e8] text-[13px] text-white transition-colors hover:bg-[#2448d8]">立即充值</button>
           </Card>
 
           <Card className="p-5">

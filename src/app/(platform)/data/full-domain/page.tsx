@@ -115,13 +115,13 @@ function TableToolbarButtons() {
   const buttonClass = "flex h-[30px] w-[30px] items-center justify-center rounded-[4px] bg-[#f6f6f7] text-[#4e5969] transition-colors hover:bg-[#eceef1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2a55e5]";
   return (
     <div className="flex items-center gap-2.5">
-      <button type="button" className={buttonClass} aria-label="下载数据" title="下载数据">
+      <button type="button" data-auth-required className={buttonClass} aria-label="下载数据" title="下载数据">
         <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none" aria-hidden="true"><path d="M8 2.5v7m0 0 2.4-2.4M8 9.5 5.6 7.1M3 10.5v2.2h10v-2.2" stroke="currentColor" strokeWidth="1.35" strokeLinecap="round" strokeLinejoin="round"/></svg>
       </button>
-      <button type="button" className={buttonClass} aria-label="重置列宽" title="重置列宽">
+      <button type="button" data-auth-required className={buttonClass} aria-label="重置列宽" title="重置列宽">
         <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none" aria-hidden="true"><path d="M3.2 4h9.6M5 4v8M11 4v8M3.5 7.2h3M9.5 7.2h3M4.5 6.2l-1 1 1 1M11.5 6.2l1 1-1 1" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"/></svg>
       </button>
-      <button type="button" className={buttonClass} aria-label="选择列" title="选择列">
+      <button type="button" data-auth-required className={buttonClass} aria-label="选择列" title="选择列">
         <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none" aria-hidden="true"><path d="M3 4h10M3 8h10M3 12h10M6 2.8v2.4M10 6.8v2.4M7 10.8v2.4" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round"/><circle cx="6" cy="4" r="1" fill="#f6f6f7" stroke="currentColor" strokeWidth="1.1"/><circle cx="10" cy="8" r="1" fill="#f6f6f7" stroke="currentColor" strokeWidth="1.1"/><circle cx="7" cy="12" r="1" fill="#f6f6f7" stroke="currentColor" strokeWidth="1.1"/></svg>
       </button>
     </div>
@@ -285,6 +285,7 @@ function Sidebar() {
                   <button
                     type="button"
                     aria-expanded={item.collapsible ? expanded : undefined}
+                    data-auth-required={!item.active && !item.collapsible ? "" : undefined}
                     onClick={item.collapsible ? () => setStandardOpen((open) => !open) : undefined}
                     className={`flex h-9 w-full items-center rounded px-3 text-left font-medium transition-colors ${
                       highlighted
@@ -302,6 +303,7 @@ function Sidebar() {
                         <button
                           key={child}
                           type="button"
+                          data-auth-required
                           className="flex h-10 w-full items-center rounded pl-11 pr-3 text-left text-[13px] font-normal text-[#323335] transition-colors hover:bg-white/70 hover:text-[#165dff]"
                         >
                           {child}
@@ -336,21 +338,6 @@ function AccountArtwork({ src, alt = "店铺头像", compact = false }: { src?: 
       <span className={compact ? "text-[10px]" : "text-lg"}>{alt.slice(0, 1)}</span>
     </span>
   );
-}
-
-const materialContentShares: Record<string, number> = {
-  "直播间画面": 0.58,
-  "视频": 0.22,
-  "图文": 0.1,
-  "其他创意": 0.06,
-  "标题": 0.04,
-};
-
-function materialDataShare(accountId: string, businessTab: string, contentTab: string) {
-  const seed = [...accountId].reduce((sum, value) => sum + Number(value || 0), 0);
-  const liveShare = 0.74 + (seed % 12) / 100;
-  const businessShare = businessTab === "推直播" ? liveShare : 1 - liveShare;
-  return businessShare * (materialContentShares[contentTab] ?? 1);
 }
 
 type DataTableSort = { index: number; direction: "ascending" | "descending" } | null;
@@ -406,7 +393,7 @@ function DataTable({
 }) {
   const [sort, setSort] = useState<DataTableSort>(null);
   const profile = getDouyinProfile(accountId, storeName);
-  const dataShare = dimension === "素材" ? materialDataShare(accountId, businessTab, contentTab) : 1;
+  const dataShare = 1;
   const rows = dates.map((date) => {
     const overview = buildAccountOverview(accountId, date, date);
     const metricKey = getAccountDeliveryProfile(accountId).type === "omni" ? "omni" : "standard";
@@ -729,8 +716,8 @@ function DouyinDataPanel({ accountId, storeName, dates }: { accountId: string; s
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-[#1d2129]">数据概览</h2>
           <div className="flex gap-2">
-            <button type="button" className="flex h-[30px] w-[30px] items-center justify-center rounded-[4px] bg-[#f7f8fa] text-[#4e5969] hover:bg-[#eef0f3]" aria-label="自定义指标"><SlidersHorizontal className="h-3.5 w-3.5" /></button>
-            <button type="button" className="flex h-[30px] w-[30px] items-center justify-center rounded-[4px] bg-[#f7f8fa] text-[#4e5969] hover:bg-[#eef0f3]" aria-label="全屏"><Maximize2 className="h-3.5 w-3.5" /></button>
+            <button type="button" data-auth-required className="flex h-[30px] w-[30px] items-center justify-center rounded-[4px] bg-[#f7f8fa] text-[#4e5969] hover:bg-[#eef0f3]" aria-label="自定义指标"><SlidersHorizontal className="h-3.5 w-3.5" /></button>
+            <button type="button" data-auth-required className="flex h-[30px] w-[30px] items-center justify-center rounded-[4px] bg-[#f7f8fa] text-[#4e5969] hover:bg-[#eef0f3]" aria-label="全屏"><Maximize2 className="h-3.5 w-3.5" /></button>
           </div>
         </div>
         <div className="mt-3 flex h-[34px] items-center rounded-[3px] border border-[#9cc4ff] bg-[#eff7ff] px-4 text-xs text-[#4e5969]">
@@ -750,7 +737,7 @@ function DouyinDataPanel({ accountId, storeName, dates }: { accountId: string; s
         </div>
         <div className="mt-[15px] flex items-center justify-between">
           <h3 className="text-sm font-semibold text-[#1d2129]">数据对比</h3>
-          <button type="button" className="inline-flex items-center gap-1 text-xs text-[#323335]">展开对比<span className="text-[13px]">⌃</span></button>
+          <button type="button" data-auth-required className="inline-flex items-center gap-1 text-xs text-[#323335]">展开对比<span className="text-[13px]">⌃</span></button>
         </div>
         <div className="mt-[7px] flex justify-center gap-7 text-xs text-[#4e5969]">
           <span className="flex items-center"><i className="mr-1.5 h-2.5 w-2.5 rounded-[2px] bg-[#3568ec]" />整体消耗(元)<span className="ml-1 text-[#86909c]">⌄</span></span>
@@ -881,8 +868,8 @@ function LiveRoomDataPanel({ accountId, storeName, dates }: { accountId: string;
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-[#1d2129]">数据概览</h2>
           <div className="flex gap-2">
-            <button type="button" className="flex h-8 w-8 items-center justify-center rounded bg-[#f7f8fa] text-[#4e5969]" aria-label="自定义指标"><SlidersHorizontal className="h-4 w-4" /></button>
-            <button type="button" className="flex h-8 w-8 items-center justify-center rounded bg-[#f7f8fa] text-[#4e5969]" aria-label="全屏"><Maximize2 className="h-4 w-4" /></button>
+            <button type="button" data-auth-required className="flex h-8 w-8 items-center justify-center rounded bg-[#f7f8fa] text-[#4e5969]" aria-label="自定义指标"><SlidersHorizontal className="h-4 w-4" /></button>
+            <button type="button" data-auth-required className="flex h-8 w-8 items-center justify-center rounded bg-[#f7f8fa] text-[#4e5969]" aria-label="全屏"><Maximize2 className="h-4 w-4" /></button>
           </div>
         </div>
         <div className="mt-3 flex h-[34px] items-center rounded border border-[#9cc4ff] bg-[#eff7ff] px-4 text-xs text-[#4e5969]">
@@ -899,7 +886,7 @@ function LiveRoomDataPanel({ accountId, storeName, dates }: { accountId: string;
         </div>
         <div className="mt-4 flex items-center justify-between">
           <h3 className="text-sm font-semibold text-[#1d2129]">数据对比</h3>
-          <button type="button" className="text-xs text-[#323335]">展开对比⌃</button>
+          <button type="button" data-auth-required className="text-xs text-[#323335]">展开对比⌃</button>
         </div>
         <div className="mt-2 flex justify-center gap-7 text-xs text-[#4e5969]">
           <span className="flex items-center"><i className="mr-1.5 h-2.5 w-2.5 rounded-sm bg-[#3568ec]" />整体消耗(元)⌄</span>
@@ -989,11 +976,11 @@ export default function FullDomainDataPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-7">
                 <h1 className="text-lg font-semibold text-[#1d2129]">全域投放数据</h1>
-                <span className="text-xs text-[#86909c]">展示全域投放的数据 <button className="ml-1 underline underline-offset-2">了解更多</button></span>
+                <span className="text-xs text-[#86909c]">展示全域投放的数据 <button data-auth-required className="ml-1 underline underline-offset-2">了解更多</button></span>
               </div>
               <div className="flex items-center gap-3 text-xs">
                 <span className="text-[#a0a5ad]">数据更新于 {currentTime.label}</span>
-                <button className="text-[#165dff]">刷新</button>
+                <button data-auth-required className="text-[#165dff]">刷新</button>
                 <SelectButton
                   className="w-[96px] text-[#1d2129]"
                   options={["汇总","分日", "分时"]}
@@ -1070,7 +1057,7 @@ export default function FullDomainDataPage() {
             <div className="mt-4 flex items-center text-[13px]">
               <span className="mr-4 text-[#323335]">数据筛选</span>
               {dimension === "直播间" ? (
-                <button type="button" className="flex h-8 w-[132px] items-center justify-between rounded bg-[#f7f8fa] px-3 text-[13px] text-[#323335]">
+                <button type="button" data-auth-required className="flex h-8 w-[132px] items-center justify-between rounded bg-[#f7f8fa] px-3 text-[13px] text-[#323335]">
                   <span>直播间：已选 <i className="inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[#2a55e5] px-1 text-[10px] not-italic text-white">1</i></span>
                   <SlidersHorizontal className="h-3.5 w-3.5 text-[#86909c]" />
                 </button>
@@ -1112,7 +1099,7 @@ export default function FullDomainDataPage() {
               <div className="mb-3 flex h-[34px] items-center rounded border border-[#9cc4ff] bg-[#eff7ff] px-4 text-xs text-[#4e5969]">
                 <Info className="mr-2 h-3.5 w-3.5 fill-[#2468e8] text-white" />
                 <span>全域投放中，判断素材最重要的指标是“整体成交金额(GMV)”，为实现整体GMV最大化，各素材消耗和ROI可能受到其他素材影响动态变化，不能与标准投放直接对比。详见</span>
-                <button className="ml-1 text-[#165dff]">全域素材攻略</button>
+                <button data-auth-required className="ml-1 text-[#165dff]">全域素材攻略</button>
                 <button type="button" onClick={() => setNoticeVisible(false)} className="ml-auto text-[#86909c]" aria-label="关闭提示">
                   <X className="h-3.5 w-3.5" />
                 </button>

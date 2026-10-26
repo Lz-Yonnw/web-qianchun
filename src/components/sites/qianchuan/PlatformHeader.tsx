@@ -39,7 +39,7 @@ type ToolGroup = {
 const NAV: NavItem[] = [
   { label: "首页", href: "/home" },
   { label: "乘方", badge: "新升级" },
-  { label: "全域投放" },
+  { label: "全域投放", href: "/data/full-domain" },
   { label: "品牌投放", menu: "brand" },
   { label: "数据", menu: "data" },
   { label: "工具", menu: "tools" },
@@ -129,11 +129,11 @@ function MenuGlyph() {
 function BrandMenu() {
   return (
     <div role="menu" aria-label="品牌投放二级菜单" className="absolute left-1/2 top-full w-[200px] -translate-x-1/2 rounded-b-xl bg-white p-3 shadow-[0_10px_28px_rgba(29,33,41,0.14)]">
-      <button type="button" role="menuitem" className="flex w-full gap-2 rounded-lg px-2 py-2 text-left hover:bg-[#f7f8fa]">
+      <button type="button" role="menuitem" data-auth-required className="flex w-full gap-2 rounded-lg px-2 py-2 text-left hover:bg-[#f7f8fa]">
         <MenuGlyph />
         <span><strong className="block text-sm font-medium text-[#323335]">品牌竞价</strong><small className="mt-1 block text-xs text-[#969aa0]">人群种草和直播加热</small></span>
       </button>
-      <button type="button" role="menuitem" className="mt-1 flex w-full gap-2 rounded-lg px-2 py-2 text-left hover:bg-[#f7f8fa]">
+      <button type="button" role="menuitem" data-auth-required className="mt-1 flex w-full gap-2 rounded-lg px-2 py-2 text-left hover:bg-[#f7f8fa]">
         <MenuGlyph />
         <span><strong className="block text-sm font-medium text-[#323335]">品牌合约</strong><small className="mt-1 block text-xs text-[#969aa0]">曝光&amp;种草&amp;搜索经营</small></span>
       </button>
@@ -157,7 +157,7 @@ function DataMenu({ accountId }: { accountId: string }) {
             {group.items.map((item) => item.href ? (
               <Link key={item.label} href={item.href} role="menuitem" className="block text-sm text-[#4e5969] hover:text-[#165dff]">{item.label}</Link>
             ) : (
-              <button type="button" role="menuitem" key={item.label} className="block text-sm text-[#4e5969] hover:text-[#165dff]">{item.label}</button>
+              <button type="button" role="menuitem" data-auth-required key={item.label} className="block text-sm text-[#4e5969] hover:text-[#165dff]">{item.label}</button>
             ))}
           </div>
         </div>
@@ -175,13 +175,13 @@ function ToolsMenu() {
           <div className="mt-3 space-y-4">
             {group.items.map((item) => (
               <div key={item.label}>
-                <button type="button" role="menuitem" className={`flex w-full items-center gap-2 text-left text-sm text-[#323335] hover:text-[#165dff] ${item.plain ? "pl-6 font-normal" : "font-semibold"}`}>
+                <button type="button" role="menuitem" data-auth-required className={`flex w-full items-center gap-2 text-left text-sm text-[#323335] hover:text-[#165dff] ${item.plain ? "pl-6 font-normal" : "font-semibold"}`}>
                   {!item.plain && <MenuGlyph />}
                   <span>{item.label}{item.external && <span className="ml-1 text-xs">↗</span>}</span>
                 </button>
                 {item.children && (
                   <div className="mt-3 space-y-3 pl-7">
-                    {item.children.map((child) => <button type="button" role="menuitem" key={child} className="block text-sm text-[#4e5969] hover:text-[#165dff]">{child}</button>)}
+                    {item.children.map((child) => <button type="button" role="menuitem" data-auth-required key={child} className="block text-sm text-[#4e5969] hover:text-[#165dff]">{child}</button>)}
                   </div>
                 )}
               </div>
@@ -196,8 +196,8 @@ function ToolsMenu() {
 function MarketingMenu() {
   return (
     <div role="menu" aria-label="营销二级菜单" className="absolute left-1/2 top-full w-[176px] -translate-x-1/2 rounded-b-xl bg-white p-3 shadow-[0_10px_28px_rgba(29,33,41,0.14)]">
-      <button type="button" role="menuitem" className="flex w-full items-center gap-2 whitespace-nowrap rounded-lg px-1.5 py-2 text-sm text-[#323335] hover:bg-[#f7f8fa]"><MenuGlyph />活动中心<span className="shrink-0 whitespace-nowrap rounded-full bg-[#ff3aa0] px-1.5 py-0.5 text-[10px] font-semibold text-white">双11</span></button>
-      <button type="button" role="menuitem" className="mt-1 flex w-full items-center gap-2 whitespace-nowrap rounded-lg px-1.5 py-2 text-sm text-[#323335] hover:bg-[#f7f8fa]"><MenuGlyph />福利中心</button>
+      <button type="button" role="menuitem" data-auth-required className="flex w-full items-center gap-2 whitespace-nowrap rounded-lg px-1.5 py-2 text-sm text-[#323335] hover:bg-[#f7f8fa]"><MenuGlyph />活动中心<span className="shrink-0 whitespace-nowrap rounded-full bg-[#ff3aa0] px-1.5 py-0.5 text-[10px] font-semibold text-white">双11</span></button>
+      <button type="button" role="menuitem" data-auth-required className="mt-1 flex w-full items-center gap-2 whitespace-nowrap rounded-lg px-1.5 py-2 text-sm text-[#323335] hover:bg-[#f7f8fa]"><MenuGlyph />福利中心</button>
     </div>
   );
 }
@@ -211,7 +211,7 @@ function Submenu({ menu, accountId }: { menu: MenuKey; accountId: string }) {
 
 function TopIcon({ children, label }: { children: React.ReactNode; label: string }) {
   return (
-    <button type="button" aria-label={label} title={label} className="flex h-10 w-9 items-center justify-center rounded-md text-[#9299a2] transition-colors hover:bg-white/70 hover:text-[#6b737c] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2a55e5] [&_svg]:h-5 [&_svg]:w-5">
+    <button type="button" data-auth-required aria-label={label} title={label} className="flex h-10 w-9 items-center justify-center rounded-md text-[#9299a2] transition-colors hover:bg-white/70 hover:text-[#6b737c] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2a55e5] [&_svg]:h-5 [&_svg]:w-5">
       {children}
     </button>
   );
@@ -281,7 +281,7 @@ export function PlatformHeader({ active }: { active?: string }) {
               onMouseEnter={() => setOpenMenu(item.menu ?? null)}
             >
               {item.href ? (
-                <Link href={item.href === "/home" ? homeHref : item.href}>{inner}</Link>
+                <Link href={item.href === "/home" ? homeHref : item.href === "/data/full-domain" ? buildFullDomainHref(accountId) : item.href}>{inner}</Link>
               ) : item.menu ? (
                 <button
                   type="button"
@@ -294,7 +294,7 @@ export function PlatformHeader({ active }: { active?: string }) {
                   {inner}
                 </button>
               ) : (
-                <button type="button" onFocus={() => setOpenMenu(null)}>{inner}</button>
+                <button type="button" data-auth-required onFocus={() => setOpenMenu(null)}>{inner}</button>
               )}
               {item.menu && menuOpen && <Submenu menu={item.menu} accountId={accountId} />}
             </div>
@@ -328,11 +328,11 @@ export function PlatformHeader({ active }: { active?: string }) {
         {/* 刷新 + 九宫格 */}
         <div className="ml-3 border-l border-[#c4c8ce] pl-5">
           <div className="flex h-8 w-[60px] items-center rounded-[4px] bg-white/90 text-[#727a84] shadow-[0_1px_2px_rgba(29,33,41,0.04)]">
-            <button type="button" aria-label="刷新" title="刷新" className="flex h-8 w-[30px] items-center justify-center rounded-l-[4px] hover:bg-[#f5f7fa] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2a55e5]">
+            <button type="button" data-auth-required aria-label="刷新" title="刷新" className="flex h-8 w-[30px] items-center justify-center rounded-l-[4px] hover:bg-[#f5f7fa] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2a55e5]">
               <svg viewBox="0 0 16 16" className="h-[18px] w-[18px]" aria-hidden="true"><path fill="currentColor" d="m7.2 1.2 2.7 1.5-.8 1.4-1-.6L6.6 6 4.7 4.9l1.5-2.5-1-.6.8-1.4 1.2.8Zm4.1 4.2 2.4 4.1-1.4.8-.6-1-2.9.1V7.2l2.9-.1-.6-1 1.4-.8.8 1.1ZM7.2 14.8H2.6v-1.6h1.2L2.4 10.7l1.9-1.1 1.4 2.5.6-1 1.4.8-.5.9Z"/><circle cx="7.9" cy="8" r="1.4" fill="currentColor"/></svg>
             </button>
             <span className="h-4 w-px bg-[#e3e6eb]" aria-hidden="true" />
-            <button type="button" aria-label="应用菜单" title="应用菜单" className="flex h-8 w-[29px] items-center justify-center rounded-r-[4px] hover:bg-[#f5f7fa] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2a55e5]">
+            <button type="button" data-auth-required aria-label="应用菜单" title="应用菜单" className="flex h-8 w-[29px] items-center justify-center rounded-r-[4px] hover:bg-[#f5f7fa] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2a55e5]">
               <svg viewBox="0 0 16 16" className="h-4 w-4" fill="currentColor" aria-hidden="true"><circle cx="4" cy="4" r="1.15"/><circle cx="8" cy="4" r="1.15"/><circle cx="12" cy="4" r="1.15"/><circle cx="4" cy="8" r="1.15"/><circle cx="8" cy="8" r="1.15"/><circle cx="12" cy="8" r="1.15"/><circle cx="4" cy="12" r="1.15"/><circle cx="8" cy="12" r="1.15"/><circle cx="12" cy="12" r="1.15"/></svg>
             </button>
           </div>

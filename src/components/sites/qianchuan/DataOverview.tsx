@@ -259,12 +259,12 @@ export function DataOverview({ accountId }: { accountId?: string }) {
           ))}
         </div>
         <div className={styles.actions}>
-          <button type="button" className={styles.primaryAction}>{activeMetric.primaryButton}</button>
+          <button type="button" data-auth-required className={styles.primaryAction}>{activeMetric.primaryButton}</button>
           {activeMetric.extraDropdown && (
-            <button type="button" className={styles.secondaryAction}>{activeMetric.extraDropdown}<span>⌄</span></button>
+            <button type="button" data-auth-required className={styles.secondaryAction}>{activeMetric.extraDropdown}<span>⌄</span></button>
           )}
-          <button type="button" className={styles.secondaryAction}><DetailIcon />{activeMetric.secondaryButton}</button>
-          <button type="button" className={styles.secondaryAction}><CustomIcon />自定义数据</button>
+          <button type="button" data-auth-required className={styles.secondaryAction}><DetailIcon />{activeMetric.secondaryButton}</button>
+          <button type="button" data-auth-required className={styles.secondaryAction}><CustomIcon />自定义数据</button>
         </div>
       </div>
 
