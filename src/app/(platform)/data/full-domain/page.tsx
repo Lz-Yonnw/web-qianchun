@@ -14,7 +14,7 @@ import {
 import { PlatformHeader } from "@/components/sites/qianchuan/PlatformHeader";
 import { useCurrentTime } from "@/components/sites/qianchuan/currentTime";
 import { DateRangePicker } from "@/components/sites/qianchuan/DateRangePicker";
-import { buildAccountOverview } from "@/components/sites/qianchuan/accountOverviewData";
+import { buildAccountOverview, getDailyRow } from "@/components/sites/qianchuan/accountOverviewData";
 import { ChartHoverCard, chartPeriod } from "@/components/sites/qianchuan/ChartHoverCard";
 import { getAccountDeliveryProfile } from "@/lib/account-delivery";
 import { buildFullDomainHref } from "@/lib/full-domain-route";
@@ -393,23 +393,16 @@ function DataTable({
 }) {
   const [sort, setSort] = useState<DataTableSort>(null);
   const profile = getDouyinProfile(accountId, storeName);
-  const dataShare = 1;
   const rows = dates.map((date) => {
-    const overview = buildAccountOverview(accountId, date, date);
-    const metricKey = getAccountDeliveryProfile(accountId).type === "omni" ? "omni" : "standard";
-    const deliveryMetric = overview.metrics.find((metric) => metric.key === metricKey);
-    const indicator = (key: string) => numeric(deliveryMetric?.indicators.find((item) => item.key === key)?.value);
-    const spend = numeric(deliveryMetric?.value) * dataShare;
-    const seed = [...`${accountId}-${date}`].reduce((sum, character) => sum + character.charCodeAt(0), 0);
-    const reportedImpressions = indicator("impr");
-    const impressions = Math.round(reportedImpressions > 0
-      ? reportedImpressions * dataShare
-      : spend * (15.7 + seed % 25 / 10));
-    const reportedClickRate = indicator("click") / 100;
-    const clickRate = reportedClickRate > 0 ? reportedClickRate : 0.026 + seed % 52 / 10_000;
-    const clicks = Math.round(impressions * clickRate);
-    const orders = Math.round(indicator("orders") * dataShare);
-    const gmv = indicator("gmv") * dataShare;
+    const row = getDailyRow(accountId, date);
+    const spendCents = row?.[1] ?? 0;
+    const impressions = row?.[2] ?? 0;
+    const clicks = row?.[3] ?? 0;
+    const orders = row?.[4] ?? 0;
+    const gmvCents = row?.[5] ?? 0;
+    const spend = spendCents / 100;
+    const gmv = gmvCents / 100;
+    const clickRate = impressions > 0 ? clicks / impressions : 0;
     return { date, impressions, clicks, clickRate, orders, gmv, spend };
   });
   const totals = rows.reduce((sum, row) => ({
@@ -431,7 +424,7 @@ function DataTable({
     `${(row.clicks > 0 ? row.orders / row.clicks * 100 : 0).toFixed(2)}%`,
     row.orders.toLocaleString("zh-CN"),
     formatMoney(row.gmv),
-    `${(row.clicks > 0 ? row.orders / row.clicks * 100 : 0).toFixed(2)}%`,
+    `${(row.spend > 0 ? row.gmv / row.spend : 0).toFixed(2)}%`,
     formatMoney(row.spend),
     `${(totals.spend > 0 ? row.spend / totals.spend * 100 : 0).toFixed(2)}%`,
   ];
@@ -442,7 +435,7 @@ function DataTable({
     row.clicks > 0 ? row.orders / row.clicks : 0,
     row.orders,
     row.gmv,
-    row.clicks > 0 ? row.orders / row.clicks : 0,
+    row.spend > 0 ? row.gmv / row.spend : 0,
     row.spend,
     totals.spend > 0 ? row.spend / totals.spend : 0,
   ];
